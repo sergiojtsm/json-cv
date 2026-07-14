@@ -1,6 +1,6 @@
 # PDF Feasibility Result
 
-**Status:** AUTOMATED PASS; NATIVE VERIFICATION PENDING FOR CURRENT HEAD
+**Status:** PASS
 **Scope:** Desktop Chrome/Chromium, A4, JSON Resume Schema 1.3.0
 
 ## Test Environment
@@ -10,6 +10,7 @@
 - Native browser: Google Chrome 150.0.7871.115
 - Automation: Playwright 1.61.1 with its Desktop Chrome project
 - Runtime: Node.js 24.15.0, npm 11.12.1
+- Source commit: `6575c71`
 - Source under test: Astro production build served from the generated static `dist` artifact
 - PDF settings: A4, CSS page size preferred, backgrounds enabled, tagged PDF enabled
 
@@ -32,14 +33,16 @@
 
 ## Native Print Evidence
 
-The renderer output changed after the previously confirmed native run. Native Chrome Save as PDF verification must be rerun for the current head before restoring a native PASS decision.
+The user manually verified all six outputs through native Chrome's Save as PDF flow for source commit `6575c71` in the environment documented above.
 
-| Template     | Complete | Long    |
-| ------------ | -------- | ------- |
-| Editorial    | PENDING  | PENDING |
-| Minimal      | PENDING  | PENDING |
-| Professional | PENDING  | PENDING |
+| Template     | Complete | Long |
+| ------------ | -------- | ---- |
+| Editorial    | PASS     | PASS |
+| Minimal      | PASS     | PASS |
+| Professional | PASS     | PASS |
+
+For editorial-long, Experience begins on page 1 without a large avoidable gap, the output is five pages, and Company 01 continues on page 2. The prior native criteria remain satisfied for all six outputs.
 
 ## Decision
 
-The automated browser-only HTML/CSS print architecture checks pass. The native feasibility gate for the current head remains pending until all six complete/long template checks are rerun in desktop Chrome with A4 output.
+The browser-only HTML/CSS print architecture is viable for the MVP under the tested environment and settings. Planning and implementation of the complete editor may proceed. This decision does not establish universal browser or ATS support; support remains limited to current stable desktop Chrome/Chromium and A4 output.
