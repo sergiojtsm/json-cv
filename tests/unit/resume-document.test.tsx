@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { AjvResumeValidator } from "../../src/resume-editor/adapters/validation/ajv-resume-validator";
 import { completeResume, shortResume } from "../../src/resume-fixtures/resumes";
+import { templateRegistry } from "../../src/resume-templates/template-registry";
 import { ResumeDocument } from "../../src/resume-templates/shared/ResumeDocument";
 import type { Resume } from "../../src/resume/domain/generated/resume";
 
@@ -25,6 +26,15 @@ const headings = [
 ];
 
 describe("ResumeDocument", () => {
+  it("all registered templates render the same semantic resume", () => {
+    for (const [templateId, Template] of Object.entries(templateRegistry)) {
+      const html = renderToStaticMarkup(<Template resume={completeResume} />);
+      expect(html, templateId).toContain("Alex Morgan");
+      expect(html, templateId).toContain("Projects");
+      expect(html, templateId).toContain("Accessible UI Kit");
+    }
+  });
+
   it("renders every human-facing section in a stable linear order", () => {
     const html = renderToStaticMarkup(
       <ResumeDocument resume={completeResume} />,

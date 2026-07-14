@@ -1,0 +1,150 @@
+@page {
+  size: A4;
+  margin: 14mm 15mm 16mm;
+}
+
+.resume-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 14mm 15mm 16mm;
+  color: #172033;
+  background: white;
+  box-shadow: 0 12px 36px rgb(15 23 42 / 12%);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.resume-document {
+  font-size: 10pt;
+  line-height: 1.42;
+}
+
+.resume-document h1 {
+  margin: 0;
+  font-size: 24pt;
+  line-height: 1.05;
+}
+
+.resume-label {
+  margin: 0.3rem 0 0.6rem;
+  font-size: 12pt;
+}
+
+.resume-document address {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+  font-style: normal;
+}
+
+.resume-document section {
+  margin-top: 1rem;
+}
+
+.resume-document h2 {
+  margin: 0 0 0.45rem;
+  padding-bottom: 0.18rem;
+  font-size: 10pt;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  border-bottom: 1px solid currentColor;
+  break-after: avoid;
+}
+
+.resume-document h3 {
+  margin: 0;
+  font-size: 10.5pt;
+  break-after: avoid;
+}
+
+.resume-document p {
+  margin: 0.22rem 0;
+}
+
+.resume-document ul {
+  margin: 0.25rem 0;
+  padding-left: 1.15rem;
+}
+
+.resume-entry {
+  margin-top: 0.55rem;
+  break-inside: avoid;
+}
+
+.entry-meta {
+  color: #4b5563;
+}
+
+.resume-document blockquote {
+  margin: 0.5rem 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid currentColor;
+  break-inside: avoid;
+}
+
+.theme-editorial {
+  border-top: 5mm solid #163c64;
+}
+
+.theme-editorial h1,
+.theme-editorial h2 {
+  color: #163c64;
+}
+
+.theme-minimal {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.theme-minimal h2 {
+  color: #111827;
+  border-bottom-width: 1px;
+}
+
+.theme-professional {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.theme-professional h1 {
+  color: #303b4f;
+}
+
+.theme-professional h2 {
+  color: #303b4f;
+  border-bottom: 2px solid #8793a5;
+}
+
+@media print {
+  :root,
+  body {
+    color: #172033;
+    background: white;
+  }
+
+  .feasibility-toolbar {
+    display: none !important;
+  }
+
+  .preview-surface {
+    padding: 0;
+  }
+
+  .resume-page {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .preview-surface {
+    padding: 0.75rem;
+    overflow-x: auto;
+  }
+
+  .resume-page {
+    transform-origin: top left;
+  }
+}

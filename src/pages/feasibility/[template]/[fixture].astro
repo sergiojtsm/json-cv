@@ -1,0 +1,59 @@
+---
+import "../../../shared/styles/global.css";
+import "../../../resume-templates/template.css";
+import {
+  templateIds,
+  type TemplateId,
+} from "../../../resume-templates/domain/resume-template";
+import { templateRegistry } from "../../../resume-templates/template-registry";
+import {
+  completeResume,
+  longResume,
+  shortResume,
+} from "../../../resume-fixtures/resumes";
+import type { Resume } from "../../../resume/domain/generated/resume";
+
+const fixtureRegistry = {
+  short: shortResume,
+  complete: completeResume,
+  long: longResume,
+} satisfies Record<string, Resume>;
+type FixtureId = keyof typeof fixtureRegistry;
+
+export function getStaticPaths() {
+  const fixtureIds: FixtureId[] = ["short", "complete", "long"];
+
+  return templateIds.flatMap((template) =>
+    fixtureIds.map((fixture) => ({
+      params: { template, fixture },
+      props: { template, fixture },
+    })),
+  );
+}
+
+type Props = { template: TemplateId; fixture: FixtureId };
+const { template, fixture } = Astro.props;
+const Template = templateRegistry[template];
+const resume = fixtureRegistry[fixture];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{template} / {fixture} PDF fixture</title>
+  </head>
+  <body>
+    <nav class="feasibility-toolbar">
+      <a href="/">Fixtures</a> · {template} · {fixture}
+    </nav>
+    <main
+      class="preview-surface"
+      data-template={template}
+      data-fixture={fixture}
+    >
+      <Template resume={resume} />
+    </main>
+  </body>
+</html>
