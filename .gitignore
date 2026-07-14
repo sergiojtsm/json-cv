@@ -1,0 +1,9 @@
+.worktrees/
+.superpowers/
+node_modules/
+dist/
+.astro/
+playwright-report/
+test-results/
+*.pdf
+.DS_Store
