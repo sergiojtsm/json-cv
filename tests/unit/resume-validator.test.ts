@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { AjvResumeValidator } from "../../src/resume-editor/adapters/validation/ajv-resume-validator";
+import {
+  completeResume,
+  longResume,
+  shortResume,
+} from "../../src/resume-fixtures/resumes";
 
 describe("AjvResumeValidator", () => {
   const validator = new AjvResumeValidator();
@@ -23,8 +28,20 @@ describe("AjvResumeValidator", () => {
       ok: false,
       diagnostics: expect.arrayContaining([
         expect.objectContaining({ path: "/basics/email", keyword: "format" }),
-        expect.objectContaining({ path: "/work/0/startDate", keyword: "pattern" }),
+        expect.objectContaining({
+          path: "/work/0/startDate",
+          keyword: "pattern",
+        }),
       ]),
     });
+  });
+
+  it.each([
+    ["short", shortResume],
+    ["complete", completeResume],
+    ["long", longResume],
+  ])("accepts the %s feasibility fixture", (_name, resume) => {
+    const fixtureValidator = new AjvResumeValidator();
+    expect(fixtureValidator.validate(resume).ok).toBe(true);
   });
 });
