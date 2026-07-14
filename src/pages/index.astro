@@ -18,7 +18,11 @@ const templates = ["editorial", "minimal", "professional"];
         {
           templates.flatMap((template) =>
             fixtures.map((fixture) => (
-              <li><a href={`/feasibility/${template}/${fixture}`}>{template} / {fixture}</a></li>
+              <li>
+                <a href={`/feasibility/${template}/${fixture}`}>
+                  {template} / {fixture}
+                </a>
+              </li>
             )),
           )
         }

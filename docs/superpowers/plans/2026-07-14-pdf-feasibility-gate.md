@@ -6,7 +6,7 @@
 
 **Architecture:** Create the smallest executable slice of the approved Screaming/Hexagonal architecture: a technology-free `resume` domain, a typed template contract, three React template adapters, Astro fixture routes, and Playwright/PDF.js acceptance tests. Do not build the editor, persistence, import/export UI, or landing page until this gate passes.
 
-**Tech Stack:** Node.js 24, npm, Astro 7, React 19, TypeScript 7, `@jsonresume/schema` 1.3, AJV 8, `json-schema-to-typescript`, Vitest, Playwright Chromium, PDF.js, CSS Paged Media.
+**Tech Stack:** Node.js 24, npm, Astro 7, React 19, TypeScript 5.9, `@jsonresume/schema` 1.3, AJV 8, `json-schema-to-typescript`, Vitest, Playwright Chromium, PDF.js, CSS Paged Media.
 
 ## Global Constraints
 
@@ -142,7 +142,7 @@ Create `package.json`:
     "pdfjs-dist": "6.1.200",
     "prettier": "3.9.5",
     "prettier-plugin-astro": "0.14.1",
-    "typescript": "7.0.2",
+    "typescript": "5.9.3",
     "vitest": "4.1.10"
   }
 }

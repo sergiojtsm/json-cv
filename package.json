@@ -34,7 +34,7 @@
     "pdfjs-dist": "6.1.200",
     "prettier": "3.9.5",
     "prettier-plugin-astro": "0.14.1",
-    "typescript": "7.0.2",
+    "typescript": "5.9.3",
     "vitest": "4.1.10"
   }
 }
