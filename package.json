@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "generate:types": "node scripts/generate-resume-types.mjs",
+    "build": "npm run generate:types && astro check && astro build",
     "preview": "astro preview",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
