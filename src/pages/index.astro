@@ -1,0 +1,28 @@
+---
+const fixtures = ["short", "complete", "long"];
+const templates = ["editorial", "minimal", "professional"];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>JSON CV PDF feasibility</title>
+  </head>
+  <body>
+    <main>
+      <h1>PDF feasibility fixtures</h1>
+      <p>This route is a technical harness, not the product landing page.</p>
+      <ul>
+        {
+          templates.flatMap((template) =>
+            fixtures.map((fixture) => (
+              <li><a href={`/feasibility/${template}/${fixture}`}>{template} / {fixture}</a></li>
+            )),
+          )
+        }
+      </ul>
+    </main>
+  </body>
+</html>
