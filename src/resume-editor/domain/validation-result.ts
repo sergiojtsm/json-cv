@@ -4,6 +4,8 @@ export type ValidationDiagnostic = {
   path: string;
   keyword: string;
   message: string;
+  line?: number;
+  column?: number;
 };
 
 export type ResumeValidationResult =
