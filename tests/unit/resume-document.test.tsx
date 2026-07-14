@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { AjvResumeValidator } from "../../src/resume-editor/adapters/validation/ajv-resume-validator";
 import { completeResume, shortResume } from "../../src/resume-fixtures/resumes";
+import { templateIds } from "../../src/resume-templates/domain/resume-template";
 import { templateRegistry } from "../../src/resume-templates/template-registry";
 import { ResumeDocument } from "../../src/resume-templates/shared/ResumeDocument";
 import type { Resume } from "../../src/resume/domain/generated/resume";
@@ -26,12 +27,34 @@ const headings = [
 ];
 
 describe("ResumeDocument", () => {
-  it("all registered templates render the same semantic resume", () => {
-    for (const [templateId, Template] of Object.entries(templateRegistry)) {
+  it("registers exactly the declared templates in order", () => {
+    expect(Object.keys(templateRegistry)).toEqual(templateIds);
+  });
+
+  it("all registered templates render the same complete semantic resume", () => {
+    const semanticDocuments = templateIds.map((templateId) => {
+      const Template = templateRegistry[templateId];
       const html = renderToStaticMarkup(<Template resume={completeResume} />);
-      expect(html, templateId).toContain("Alex Morgan");
-      expect(html, templateId).toContain("Projects");
-      expect(html, templateId).toContain("Accessible UI Kit");
+      const container = document.createElement("div");
+      container.innerHTML = html;
+      const semanticDocument = container.querySelector(
+        "article[data-resume-document]",
+      );
+
+      expect(semanticDocument, templateId).not.toBeNull();
+      expect(
+        Array.from(
+          semanticDocument?.querySelectorAll("h2") ?? [],
+          (heading) => heading.textContent,
+        ),
+        templateId,
+      ).toEqual(headings);
+
+      return semanticDocument?.outerHTML.replace(/\s+/g, " ").trim();
+    });
+
+    for (const [index, semanticDocument] of semanticDocuments.entries()) {
+      expect(semanticDocument, templateIds[index]).toBe(semanticDocuments[0]);
     }
   });
 
@@ -39,10 +62,15 @@ describe("ResumeDocument", () => {
     const html = renderToStaticMarkup(
       <ResumeDocument resume={completeResume} />,
     );
-    const positions = headings.map((heading) => html.indexOf(`>${heading}<`));
+    const container = document.createElement("div");
+    container.innerHTML = html;
 
-    expect(positions.every((position) => position >= 0)).toBe(true);
-    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(
+      Array.from(
+        container.querySelectorAll("h2"),
+        (heading) => heading.textContent,
+      ),
+    ).toEqual(headings);
     expect(html).not.toContain("photo.png");
     expect(html).not.toContain("canonical");
     expect(html).toContain('href="mailto:alex@example.com"');
