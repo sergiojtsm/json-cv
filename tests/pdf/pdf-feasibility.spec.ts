@@ -56,8 +56,12 @@ for (const template of templates) {
     );
     expect(positions.every((position) => position >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(result.imageCount).toBe(0);
     expect(text).not.toContain("photo.png");
     expect(text).not.toContain("canonical");
+    expect(text).not.toContain("https://example.com/resume.json");
+    expect(text).not.toContain("v1.0.0");
+    expect(text).not.toContain("2026-07-14T10:00:00");
     expect(result.links).toContain("https://example.com/ui-kit");
     expect(repeatedResult).toEqual(result);
   });
