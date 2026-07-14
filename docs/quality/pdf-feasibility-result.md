@@ -16,7 +16,7 @@
 
 ## Automated Evidence
 
-- All unit and semantic rendering tests pass.
+- All 87 unit and semantic rendering tests pass.
 - All ten Playwright Chromium PDF tests pass.
 - Short fixtures produce one page with selectable text.
 - Complete fixtures preserve every human-facing standard section, reading order, and links.
