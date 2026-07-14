@@ -68,6 +68,42 @@ describe("ResumeDocument", () => {
     expect(html).not.toContain(" · ");
   });
 
+  it("preserves title-less content without empty elements in every remaining section", () => {
+    const sparseResume: Resume = {
+      awards: [{}, { summary: "Award impact" }],
+      certificates: [{}, { issuer: "Standards Body" }],
+      publications: [{}, { summary: "Publication abstract" }],
+      skills: [{}, { level: "Expert" }],
+      languages: [{}, { fluency: "Native" }],
+      interests: [{}, { keywords: ["Web standards"] }],
+      references: [{}, { reference: "Trusted collaborator" }],
+      projects: [{}, { description: "Useful toolkit" }],
+    };
+
+    expect(new AjvResumeValidator().validate(sparseResume).ok).toBe(true);
+
+    const html = renderToStaticMarkup(<ResumeDocument resume={sparseResume} />);
+    const sparseHeadings = headings.slice(4);
+    const positions = sparseHeadings.map((heading) =>
+      html.indexOf(`>${heading}<`),
+    );
+
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(html).toContain("Award impact");
+    expect(html).toContain("Standards Body");
+    expect(html).toContain("Publication abstract");
+    expect(html).toContain("Expert");
+    expect(html).toContain("Native");
+    expect(html).toContain("Web standards");
+    expect(html).toContain("Trusted collaborator");
+    expect(html).toContain("Useful toolkit");
+    expect(html).not.toMatch(
+      /<(article|header|h1|h3|p|strong|blockquote|cite)(?:\s[^>]*)?><\/\1>/,
+    );
+    expect(html).not.toContain(" · ");
+  });
+
   it("renders duplicate highlights and profiles without React key warnings", () => {
     const duplicateResume: Resume = {
       basics: {

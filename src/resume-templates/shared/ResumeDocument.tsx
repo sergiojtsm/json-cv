@@ -74,34 +74,37 @@ export function ResumeDocument({ resume }: Props) {
     basics?.url ||
     profiles.length,
   );
+  const hasHeader = Boolean(basics?.name || basics?.label || hasContact);
 
   return (
     <article className="resume-document" data-resume-document>
-      <header>
-        <h1>{basics?.name}</h1>
-        {basics?.label && <p className="resume-label">{basics.label}</p>}
-        {hasContact && (
-          <address>
-            {[location, basics?.phone].filter(Boolean).map((value, index) => (
-              <span key={`${value}-${index}`}>{value}</span>
-            ))}
-            {basics?.email && (
-              <a href={`mailto:${basics.email}`}>{basics.email}</a>
-            )}
-            {basics?.url && <a href={basics.url}>{basics.url}</a>}
-            {profiles.map((profile, index) => (
-              <Link
-                key={`${profile.url ?? profile.network ?? profile.username}-${index}`}
-                url={profile.url}
-              >
-                {[profile.network, profile.username]
-                  .filter(Boolean)
-                  .join(": ") || profile.url}
-              </Link>
-            ))}
-          </address>
-        )}
-      </header>
+      {hasHeader && (
+        <header>
+          {basics?.name && <h1>{basics.name}</h1>}
+          {basics?.label && <p className="resume-label">{basics.label}</p>}
+          {hasContact && (
+            <address>
+              {[location, basics?.phone].filter(Boolean).map((value, index) => (
+                <span key={`${value}-${index}`}>{value}</span>
+              ))}
+              {basics?.email && (
+                <a href={`mailto:${basics.email}`}>{basics.email}</a>
+              )}
+              {basics?.url && <a href={basics.url}>{basics.url}</a>}
+              {profiles.map((profile, index) => (
+                <Link
+                  key={`${profile.url ?? profile.network ?? profile.username}-${index}`}
+                  url={profile.url}
+                >
+                  {[profile.network, profile.username]
+                    .filter(Boolean)
+                    .join(": ") || profile.url}
+                </Link>
+              ))}
+            </address>
+          )}
+        </header>
+      )}
 
       {basics?.summary && (
         <Section title="Profile">
@@ -173,128 +176,170 @@ export function ResumeDocument({ resume }: Props) {
 
       {!!resume.awards?.length && (
         <Section title="Awards">
-          {resume.awards.map((item, index) => (
-            <Entry key={`${item.title}-${index}`}>
-              <h3>{item.title}</h3>
-              <p className="entry-meta">
-                {[item.awarder, item.date].filter(Boolean).join(" · ")}
-              </p>
-              {item.summary && <p>{item.summary}</p>}
-            </Entry>
-          ))}
+          {resume.awards
+            .filter(
+              (item) => item.title || item.awarder || item.date || item.summary,
+            )
+            .map((item, index) => (
+              <Entry key={`${item.title}-${index}`}>
+                <EntryHeading
+                  primary={item.title}
+                  secondary={undefined}
+                  secondaryUrl={undefined}
+                />
+                <EntryMeta parts={[item.awarder, item.date]} />
+                {item.summary && <p>{item.summary}</p>}
+              </Entry>
+            ))}
         </Section>
       )}
 
       {!!resume.certificates?.length && (
         <Section title="Certificates">
-          {resume.certificates.map((item, index) => (
-            <Entry key={`${item.name}-${index}`}>
-              <h3>
-                <Link url={item.url}>{item.name}</Link>
-              </h3>
-              <p className="entry-meta">
-                {[item.issuer, item.date].filter(Boolean).join(" · ")}
-              </p>
-            </Entry>
-          ))}
+          {resume.certificates
+            .filter((item) => item.name || item.issuer || item.date || item.url)
+            .map((item, index) => (
+              <Entry key={`${item.name}-${index}`}>
+                <EntryHeading
+                  primary={undefined}
+                  secondary={item.name ?? item.url}
+                  secondaryUrl={item.url}
+                />
+                <EntryMeta parts={[item.issuer, item.date]} />
+              </Entry>
+            ))}
         </Section>
       )}
 
       {!!resume.publications?.length && (
         <Section title="Publications">
-          {resume.publications.map((item, index) => (
-            <Entry key={`${item.name}-${index}`}>
-              <h3>
-                <Link url={item.url}>{item.name}</Link>
-              </h3>
-              <p className="entry-meta">
-                {[item.publisher, item.releaseDate].filter(Boolean).join(" · ")}
-              </p>
-              {item.summary && <p>{item.summary}</p>}
-            </Entry>
-          ))}
+          {resume.publications
+            .filter(
+              (item) =>
+                item.name ||
+                item.publisher ||
+                item.releaseDate ||
+                item.url ||
+                item.summary,
+            )
+            .map((item, index) => (
+              <Entry key={`${item.name}-${index}`}>
+                <EntryHeading
+                  primary={undefined}
+                  secondary={item.name ?? item.url}
+                  secondaryUrl={item.url}
+                />
+                <EntryMeta parts={[item.publisher, item.releaseDate]} />
+                {item.summary && <p>{item.summary}</p>}
+              </Entry>
+            ))}
         </Section>
       )}
 
       {!!resume.skills?.length && (
         <Section title="Skills">
-          {resume.skills.map((item, index) => (
-            <Entry key={`${item.name}-${index}`}>
-              <h3>
-                {item.name}
-                {item.level ? ` · ${item.level}` : ""}
-              </h3>
-              {item.keywords?.length ? (
-                <p>{item.keywords.join(" · ")}</p>
-              ) : null}
-            </Entry>
-          ))}
+          {resume.skills
+            .filter((item) => item.name || item.level || item.keywords?.length)
+            .map((item, index) => (
+              <Entry key={`${item.name}-${index}`}>
+                <EntryHeading
+                  primary={item.name}
+                  secondary={item.level}
+                  secondaryUrl={undefined}
+                />
+                {item.keywords?.length ? (
+                  <p>{item.keywords.join(" · ")}</p>
+                ) : null}
+              </Entry>
+            ))}
         </Section>
       )}
 
       {!!resume.languages?.length && (
         <Section title="Languages">
-          {resume.languages.map((item, index) => (
-            <p key={`${item.language}-${index}`}>
-              <strong>{item.language}</strong>
-              {item.fluency ? ` · ${item.fluency}` : ""}
-            </p>
-          ))}
+          {resume.languages
+            .filter((item) => item.language || item.fluency)
+            .map((item, index) => (
+              <p key={`${item.language}-${index}`}>
+                {item.language && <strong>{item.language}</strong>}
+                {item.language && item.fluency ? " · " : ""}
+                {item.fluency}
+              </p>
+            ))}
         </Section>
       )}
 
       {!!resume.interests?.length && (
         <Section title="Interests">
-          {resume.interests.map((item, index) => (
-            <p key={`${item.name}-${index}`}>
-              <strong>{item.name}</strong>
-              {item.keywords?.length ? ` · ${item.keywords.join(" · ")}` : ""}
-            </p>
-          ))}
+          {resume.interests
+            .filter((item) => item.name || item.keywords?.length)
+            .map((item, index) => (
+              <p key={`${item.name}-${index}`}>
+                {item.name && <strong>{item.name}</strong>}
+                {item.name && item.keywords?.length ? " · " : ""}
+                {item.keywords?.join(" · ")}
+              </p>
+            ))}
         </Section>
       )}
 
       {!!resume.references?.length && (
         <Section title="References">
-          {resume.references.map((item, index) => (
-            <blockquote key={`${item.name}-${index}`}>
-              <p>{item.reference}</p>
-              <cite>{item.name}</cite>
-            </blockquote>
-          ))}
+          {resume.references
+            .filter((item) => item.name || item.reference)
+            .map((item, index) => (
+              <blockquote key={`${item.name}-${index}`}>
+                {item.reference && <p>{item.reference}</p>}
+                {item.name && <cite>{item.name}</cite>}
+              </blockquote>
+            ))}
         </Section>
       )}
 
       {!!resume.projects?.length && (
         <Section title="Projects">
-          {resume.projects.map((item, index) => (
-            <Entry key={`${item.name}-${index}`}>
-              <h3>
-                <Link url={item.url}>{item.name}</Link>
-              </h3>
-              <p className="entry-meta">
-                {[
-                  formatDateRange(item.startDate, item.endDate),
-                  item.entity,
-                  item.type,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </p>
-              {item.description && <p>{item.description}</p>}
-              <List items={item.highlights} />
-              {item.roles?.length ? (
-                <p>
-                  <strong>Roles:</strong> {item.roles.join(", ")}
-                </p>
-              ) : null}
-              {item.keywords?.length ? (
-                <p>
-                  <strong>Keywords:</strong> {item.keywords.join(", ")}
-                </p>
-              ) : null}
-            </Entry>
-          ))}
+          {resume.projects
+            .filter(
+              (item) =>
+                item.name ||
+                item.description ||
+                item.highlights?.length ||
+                item.keywords?.length ||
+                item.startDate ||
+                item.endDate ||
+                item.url ||
+                item.roles?.length ||
+                item.entity ||
+                item.type,
+            )
+            .map((item, index) => (
+              <Entry key={`${item.name}-${index}`}>
+                <EntryHeading
+                  primary={undefined}
+                  secondary={item.name ?? item.url}
+                  secondaryUrl={item.url}
+                />
+                <EntryMeta
+                  parts={[
+                    formatDateRange(item.startDate, item.endDate),
+                    item.entity,
+                    item.type,
+                  ]}
+                />
+                {item.description && <p>{item.description}</p>}
+                <List items={item.highlights} />
+                {item.roles?.length ? (
+                  <p>
+                    <strong>Roles:</strong> {item.roles.join(", ")}
+                  </p>
+                ) : null}
+                {item.keywords?.length ? (
+                  <p>
+                    <strong>Keywords:</strong> {item.keywords.join(", ")}
+                  </p>
+                ) : null}
+              </Entry>
+            ))}
         </Section>
       )}
     </article>
