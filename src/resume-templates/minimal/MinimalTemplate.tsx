@@ -1,4 +1,4 @@
-import type { ResumeTemplateProps } from "../template-registry";
+import type { ResumeTemplateProps } from "../adapters/resume-template-component";
 import { ResumeDocument } from "../shared/ResumeDocument";
 
 export const MinimalTemplate = ({ resume }: ResumeTemplateProps) => (

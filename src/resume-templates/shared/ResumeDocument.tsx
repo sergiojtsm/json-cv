@@ -228,7 +228,7 @@ export function ResumeDocument({ resume }: Props) {
             <Entry key={`${item.name}-${index}`}>
               <EntryHeading
                 primary={item.position}
-                secondary={item.name}
+                secondary={hasText(item.name) ? item.name : item.url}
                 secondaryUrl={item.url}
               />
               <EntryMeta
@@ -251,7 +251,9 @@ export function ResumeDocument({ resume }: Props) {
             <Entry key={`${item.organization}-${index}`}>
               <EntryHeading
                 primary={item.position}
-                secondary={item.organization}
+                secondary={
+                  hasText(item.organization) ? item.organization : item.url
+                }
                 secondaryUrl={item.url}
               />
               <EntryMeta
@@ -270,7 +272,9 @@ export function ResumeDocument({ resume }: Props) {
             <Entry key={`${item.institution}-${index}`}>
               <EntryHeading
                 primary={[item.studyType, item.area].filter(hasText).join(" ")}
-                secondary={item.institution}
+                secondary={
+                  hasText(item.institution) ? item.institution : item.url
+                }
                 secondaryUrl={item.url}
               />
               <EntryMeta

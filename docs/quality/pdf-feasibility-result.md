@@ -1,6 +1,6 @@
 # PDF Feasibility Result
 
-**Status:** PASS
+**Status:** AUTOMATED PASS; NATIVE VERIFICATION PENDING FOR CURRENT HEAD
 **Scope:** Desktop Chrome/Chromium, A4, JSON Resume Schema 1.3.0
 
 ## Test Environment
@@ -32,19 +32,14 @@
 
 ## Native Print Evidence
 
-- All three complete templates were verified through Chrome's native Save as PDF flow.
-- All three long templates were verified through Chrome's native Save as PDF flow.
-- Output uses one column and contains no clipped, overlapping, missing, or accidental blank content.
-- Text is selectable and links remain clickable.
+The renderer output changed after the previously confirmed native run. Native Chrome Save as PDF verification must be rerun for the current head before restoring a native PASS decision.
 
-The user confirmed all six native Chrome checks as PASS:
-
-| Template     | Complete | Long |
-| ------------ | -------- | ---- |
-| Editorial    | PASS     | PASS |
-| Minimal      | PASS     | PASS |
-| Professional | PASS     | PASS |
+| Template     | Complete | Long    |
+| ------------ | -------- | ------- |
+| Editorial    | PENDING  | PENDING |
+| Minimal      | PENDING  | PENDING |
+| Professional | PENDING  | PENDING |
 
 ## Decision
 
-The browser-only HTML/CSS print architecture is viable for the MVP. Planning and implementation of the complete editor may proceed. Support remains limited to current stable desktop Chrome/Chromium and A4 output.
+The automated browser-only HTML/CSS print architecture checks pass. The native feasibility gate for the current head remains pending until all six complete/long template checks are rerun in desktop Chrome with A4 output.

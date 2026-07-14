@@ -164,6 +164,37 @@ describe("ResumeDocument", () => {
     expect(html).not.toContain(">References<");
   });
 
+  it.each([
+    [
+      "work",
+      { work: [{ url: "https://example.com/url-only-work" }] },
+      "https://example.com/url-only-work",
+    ],
+    [
+      "volunteer",
+      {
+        volunteer: [{ url: "https://example.com/url-only-volunteer" }],
+      },
+      "https://example.com/url-only-volunteer",
+    ],
+    [
+      "education",
+      {
+        education: [{ url: "https://example.com/url-only-education" }],
+      },
+      "https://example.com/url-only-education",
+    ],
+  ] satisfies Array<[string, Resume, string]>)(
+    "renders a visible linked fallback for a URL-only %s entry",
+    (_section, resume, url) => {
+      expect(new AjvResumeValidator().validate(resume).ok).toBe(true);
+
+      const html = renderToStaticMarkup(<ResumeDocument resume={resume} />);
+
+      expect(html).toContain(`<h3><a href="${url}">${url}</a></h3>`);
+    },
+  );
+
   it("omits every section and entry when arrays contain only empty valid items", () => {
     const emptyCollectionsResume: Resume = {
       basics: { profiles: [{}] },
