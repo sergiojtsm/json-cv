@@ -73,6 +73,7 @@
 
 .entry-meta {
   color: #4b5563;
+  break-after: avoid;
 }
 
 .resume-document blockquote {

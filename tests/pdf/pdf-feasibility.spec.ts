@@ -37,6 +37,20 @@ const createPdf = async (page: Page, path: string) => {
   });
 };
 
+test("print styles keep entry metadata with the following content", async ({
+  page,
+}) => {
+  await page.emulateMedia({ media: "print" });
+  await page.goto("/feasibility/minimal/short");
+
+  const breakAfter = await page
+    .locator(".entry-meta")
+    .first()
+    .evaluate((element) => getComputedStyle(element).breakAfter);
+
+  expect(breakAfter).toBe("avoid");
+});
+
 for (const template of templates) {
   test(`${template}: short resume is one selectable-text page`, async ({
     page,
@@ -110,5 +124,30 @@ for (const template of templates) {
       expect(text).toContain(`Company ${String(index).padStart(2, "0")}`);
     }
     expect(text).toContain("Delivered measurable result 45 for engagement 1");
+    for (let engagement = 1; engagement <= 14; engagement += 1) {
+      const highlightCount = engagement === 1 ? 45 : 5;
+      for (let highlight = 1; highlight <= highlightCount; highlight += 1) {
+        expect(text).toContain(
+          `Delivered measurable result ${highlight} for engagement ${engagement}.`,
+        );
+      }
+    }
+    for (let engagement = 2; engagement <= 14; engagement += 1) {
+      const company = `Company ${String(engagement).padStart(2, "0")}`;
+      const firstHighlight = `Delivered measurable result 1 for engagement ${engagement}.`;
+      const companyPage = result.pageTexts.findIndex((pageText) =>
+        pageText.includes(company),
+      );
+      const highlightPage = result.pageTexts.findIndex((pageText) =>
+        pageText.includes(firstHighlight),
+      );
+
+      expect(companyPage).toBeGreaterThanOrEqual(0);
+      expect(highlightPage).toBe(companyPage);
+    }
+    expect(text.match(/Customer platform engineering team\./g)).toHaveLength(
+      14,
+    );
+    expect(text.match(/Leads frontend architecture\./g)).toHaveLength(14);
   });
 }

@@ -35,11 +35,13 @@ Received length: 6
 
 The extracted page text confirmed Company 01 was absent from page 1 and started on page 2 in every theme.
 
-The initial result-34 page boundary was not stable across theme typography after the fix: minimal placed result 34 at the end of page 1 while editorial and professional placed it on page 2. The corrected cross-theme contract checks result 45 on page 2, proving that the oversized first entry continues across the page boundary without requiring identical line breaks across themes. Existing whole-document assertions continue to verify all 14 companies and result 45 globally.
+The initial result-34 page boundary was not stable across theme typography after the fix: minimal placed result 34 at the end of page 1 while editorial and professional placed it on page 2. The corrected cross-theme contract checks result 45 on page 2, proving that the oversized first entry continues across the page boundary without requiring identical line breaks across themes.
+
+The comprehensive long-PDF contract verifies exactly five non-empty pages, Company 01 on page 1, result 45 for engagement 1 on page 2, all 14 company names, all 110 generated work highlights (results 1-45 for engagement 1 and results 1-5 for engagements 2-14), page cohesion between each Company 02-14 heading and its first unique highlight, and exactly 14 occurrences each of the repeated work description and summary.
 
 ## Production Fix
 
-Removed only the unconditional `break-inside: avoid` declaration from `.resume-entry`. Entry spacing and heading cohesion remain unchanged; no heuristics were added.
+Removed only the unconditional `break-inside: avoid` declaration from `.resume-entry`. Entry spacing and heading cohesion remain unchanged; no heuristics were added. A follow-up cohesion rule adds `break-after: avoid` to `.entry-meta`, so the existing `h3` rule keeps the heading with metadata and metadata stays with the next body block without preventing an entire entry from splitting.
 
 ## GREEN Evidence
 
@@ -73,3 +75,56 @@ all files matched Prettier formatting
 ```
 
 Final diff and port-clear checks are recorded in the commit verification performed after this report was written.
+
+## Review Follow-up Evidence
+
+The focused print-media test was added before the metadata cohesion declaration.
+
+RED:
+
+```text
+npm run test:pdf -- --grep "print styles keep entry metadata"
+1 failed
+Expected: "avoid"
+Received: "auto"
+```
+
+GREEN after adding `.entry-meta { break-after: avoid; }`:
+
+```text
+npm run test:pdf -- --grep "print styles keep entry metadata"
+1 passed
+
+npm run test:pdf -- --grep "long resume"
+editorial/long: 5 page(s)
+minimal/long: 5 page(s)
+professional/long: 5 page(s)
+3 passed
+```
+
+The focused long tests include the exact comprehensive assertions described above. Company 01 remains intentionally split; Companies 02-14 each keep their heading and first unique highlight on the same extracted page.
+
+Follow-up full verification:
+
+```text
+npm run test:pdf
+10 passed; short 1 page, complete 2 pages, long 5 pages for each template
+
+npm test
+4 test files passed; 87 tests passed
+
+npm run build
+Astro check: 0 errors, 0 warnings, 0 hints; 10 static pages built
+
+npm run check:generated-types
+passed with no generated type diff
+
+npm run format:check
+all files matched Prettier formatting
+
+git diff --check
+passed
+
+lsof -nP -iTCP:4321 -sTCP:LISTEN
+no listener
+```
