@@ -75,6 +75,7 @@
 ### Task 1: Bootstrap the Static Test Harness
 
 **Files:**
+
 - Create: `.gitignore`
 - Create: `.nvmrc`
 - Create: `package.json`
@@ -86,6 +87,7 @@
 - Create: `src/pages/index.astro`
 
 **Interfaces:**
+
 - Consumes: Node.js `>=22.12.0`; the current environment is `v24.15.0` with npm `11.12.1`.
 - Produces: `npm run build`, `npm test`, and a static Astro route at `/`.
 
@@ -234,7 +236,11 @@ const templates = ["editorial", "minimal", "professional"];
         {
           templates.flatMap((template) =>
             fixtures.map((fixture) => (
-              <li><a href={`/feasibility/${template}/${fixture}`}>{template} / {fixture}</a></li>
+              <li>
+                <a href={`/feasibility/${template}/${fixture}`}>
+                  {template} / {fixture}
+                </a>
+              </li>
             )),
           )
         }
@@ -279,6 +285,7 @@ git commit -m "chore: bootstrap static pdf feasibility harness"
 ### Task 2: Establish the Official Schema Boundary
 
 **Files:**
+
 - Create: `scripts/generate-resume-types.mjs`
 - Create: `src/resume/domain/generated/resume.ts` through the generator
 - Create: `src/resume-editor/domain/validation-result.ts`
@@ -288,6 +295,7 @@ git commit -m "chore: bootstrap static pdf feasibility harness"
 - Modify: `package.json`
 
 **Interfaces:**
+
 - Consumes: `@jsonresume/schema/schema.json` version `1.3.0`.
 - Produces: `Resume`, `ResumeValidationResult`, `ResumeValidator`, and `AjvResumeValidator.validate(candidate: unknown)`.
 
@@ -321,7 +329,10 @@ describe("AjvResumeValidator", () => {
       ok: false,
       diagnostics: expect.arrayContaining([
         expect.objectContaining({ path: "/basics/email", keyword: "format" }),
-        expect.objectContaining({ path: "/work/0/startDate", keyword: "pattern" }),
+        expect.objectContaining({
+          path: "/work/0/startDate",
+          keyword: "pattern",
+        }),
       ]),
     });
   });
@@ -355,7 +366,8 @@ const schemaPath = require.resolve("@jsonresume/schema/schema.json");
 const outputPath = resolve(root, "src/resume/domain/generated/resume.ts");
 const schema = JSON.parse(await readFile(schemaPath, "utf8"));
 const source = await compile({ ...schema, title: "Resume" }, "Resume", {
-  bannerComment: "/* Generated from @jsonresume/schema@1.3.0. Do not edit manually. */",
+  bannerComment:
+    "/* Generated from @jsonresume/schema@1.3.0. Do not edit manually. */",
   additionalProperties: true,
   style: { singleQuote: false, semi: true, tabWidth: 2 },
 });
@@ -419,7 +431,10 @@ import addFormats from "ajv-formats";
 import resumeSchema from "@jsonresume/schema/schema.json";
 import type { Resume } from "../../../resume/domain/generated/resume";
 import type { ResumeValidator } from "../../application/ports/resume-validator";
-import type { ResumeValidationResult, ValidationDiagnostic } from "../../domain/validation-result";
+import type {
+  ResumeValidationResult,
+  ValidationDiagnostic,
+} from "../../domain/validation-result";
 
 const toDiagnostic = (error: ErrorObject): ValidationDiagnostic => ({
   path: error.instancePath || "/",
@@ -470,6 +485,7 @@ git commit -m "feat: establish json resume schema boundary"
 ### Task 3: Build the Semantic Resume Document
 
 **Files:**
+
 - Create: `src/resume-fixtures/resumes.ts`
 - Create: `src/resume/domain/formatting.ts`
 - Create: `tests/unit/formatting.test.ts`
@@ -478,6 +494,7 @@ git commit -m "feat: establish json resume schema boundary"
 - Modify: `tests/unit/resume-validator.test.ts`
 
 **Interfaces:**
+
 - Consumes: generated `Resume`.
 - Produces: `formatDateRange(startDate, endDate)`, `formatLocation(location)`, and `ResumeDocument({ resume })` with a linear semantic DOM.
 
@@ -506,11 +523,14 @@ export const shortResume: Resume = {
       highlights: ["Improved Core Web Vitals across the product."],
     },
   ],
-  skills: [{ name: "Frontend", keywords: ["TypeScript", "React", "Accessibility"] }],
+  skills: [
+    { name: "Frontend", keywords: ["TypeScript", "React", "Accessibility"] },
+  ],
 };
 
 export const completeResume: Resume = {
-  $schema: "https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json",
+  $schema:
+    "https://raw.githubusercontent.com/jsonresume/resume-schema/master/schema.json",
   basics: {
     name: "Alex Morgan",
     label: "Senior Frontend Engineer",
@@ -518,22 +538,120 @@ export const completeResume: Resume = {
     email: "alex@example.com",
     phone: "+34 600 000 000",
     url: "https://example.com",
-    summary: "Frontend engineer with seven years of experience building accessible products.",
-    location: { address: "Calle Mayor 1", postalCode: "28001", city: "Madrid", region: "Madrid", countryCode: "ES" },
-    profiles: [{ network: "LinkedIn", username: "alex", url: "https://linkedin.com/in/alex" }],
+    summary:
+      "Frontend engineer with seven years of experience building accessible products.",
+    location: {
+      address: "Calle Mayor 1",
+      postalCode: "28001",
+      city: "Madrid",
+      region: "Madrid",
+      countryCode: "ES",
+    },
+    profiles: [
+      {
+        network: "LinkedIn",
+        username: "alex",
+        url: "https://linkedin.com/in/alex",
+      },
+    ],
   },
-  work: [{ name: "Acme", location: "Madrid", position: "Senior Frontend Engineer", url: "https://example.com/acme", startDate: "2022-03", summary: "Leads frontend architecture.", highlights: ["Reduced load time by 40%.", "Mentored six engineers."] }],
-  volunteer: [{ organization: "Open Web Foundation", position: "Mentor", url: "https://example.com/foundation", startDate: "2021", summary: "Mentors junior developers.", highlights: ["Delivered twelve workshops."] }],
-  education: [{ institution: "Technical University", url: "https://example.com/university", area: "Computer Science", studyType: "BSc", startDate: "2012", endDate: "2016", score: "8.7/10", courses: ["Distributed Systems", "Human Computer Interaction"] }],
-  awards: [{ title: "Accessibility Champion", date: "2024", awarder: "Web Guild", summary: "Recognized for accessible product leadership." }],
-  certificates: [{ name: "Web Accessibility Specialist", date: "2023-04", issuer: "IAAP", url: "https://example.com/certificate" }],
-  publications: [{ name: "Design Systems at Scale", publisher: "Frontend Journal", releaseDate: "2023-09", url: "https://example.com/article", summary: "A practical guide to federated design systems." }],
-  skills: [{ name: "Frontend", level: "Expert", keywords: ["TypeScript", "React", "CSS", "Accessibility"] }],
-  languages: [{ language: "Spanish", fluency: "Native" }, { language: "English", fluency: "Professional" }],
-  interests: [{ name: "Open source", keywords: ["Web standards", "Developer tools"] }],
-  references: [{ name: "Jordan Lee", reference: "Alex consistently delivers clear, maintainable systems." }],
-  projects: [{ name: "Accessible UI Kit", description: "An open-source component library.", highlights: ["Used by four product teams."], keywords: ["React", "ARIA"], startDate: "2021", endDate: "2024", url: "https://example.com/ui-kit", roles: ["Maintainer"], entity: "Open Web Foundation", type: "open-source" }],
-  meta: { canonical: "https://example.com/resume.json", version: "v1.0.0", lastModified: "2026-07-14T10:00:00" },
+  work: [
+    {
+      name: "Acme",
+      location: "Madrid",
+      position: "Senior Frontend Engineer",
+      url: "https://example.com/acme",
+      startDate: "2022-03",
+      summary: "Leads frontend architecture.",
+      highlights: ["Reduced load time by 40%.", "Mentored six engineers."],
+    },
+  ],
+  volunteer: [
+    {
+      organization: "Open Web Foundation",
+      position: "Mentor",
+      url: "https://example.com/foundation",
+      startDate: "2021",
+      summary: "Mentors junior developers.",
+      highlights: ["Delivered twelve workshops."],
+    },
+  ],
+  education: [
+    {
+      institution: "Technical University",
+      url: "https://example.com/university",
+      area: "Computer Science",
+      studyType: "BSc",
+      startDate: "2012",
+      endDate: "2016",
+      score: "8.7/10",
+      courses: ["Distributed Systems", "Human Computer Interaction"],
+    },
+  ],
+  awards: [
+    {
+      title: "Accessibility Champion",
+      date: "2024",
+      awarder: "Web Guild",
+      summary: "Recognized for accessible product leadership.",
+    },
+  ],
+  certificates: [
+    {
+      name: "Web Accessibility Specialist",
+      date: "2023-04",
+      issuer: "IAAP",
+      url: "https://example.com/certificate",
+    },
+  ],
+  publications: [
+    {
+      name: "Design Systems at Scale",
+      publisher: "Frontend Journal",
+      releaseDate: "2023-09",
+      url: "https://example.com/article",
+      summary: "A practical guide to federated design systems.",
+    },
+  ],
+  skills: [
+    {
+      name: "Frontend",
+      level: "Expert",
+      keywords: ["TypeScript", "React", "CSS", "Accessibility"],
+    },
+  ],
+  languages: [
+    { language: "Spanish", fluency: "Native" },
+    { language: "English", fluency: "Professional" },
+  ],
+  interests: [
+    { name: "Open source", keywords: ["Web standards", "Developer tools"] },
+  ],
+  references: [
+    {
+      name: "Jordan Lee",
+      reference: "Alex consistently delivers clear, maintainable systems.",
+    },
+  ],
+  projects: [
+    {
+      name: "Accessible UI Kit",
+      description: "An open-source component library.",
+      highlights: ["Used by four product teams."],
+      keywords: ["React", "ARIA"],
+      startDate: "2021",
+      endDate: "2024",
+      url: "https://example.com/ui-kit",
+      roles: ["Maintainer"],
+      entity: "Open Web Foundation",
+      type: "open-source",
+    },
+  ],
+  meta: {
+    canonical: "https://example.com/resume.json",
+    version: "v1.0.0",
+    lastModified: "2026-07-14T10:00:00",
+  },
 };
 
 const baseWork = completeResume.work?.[0];
@@ -541,13 +659,20 @@ if (!baseWork) throw new Error("Complete fixture requires one work entry");
 
 export const longResume: Resume = {
   ...completeResume,
-  basics: { ...completeResume.basics, summary: `${completeResume.basics?.summary} ${"Detailed professional summary. ".repeat(8)}` },
+  basics: {
+    ...completeResume.basics,
+    summary: `${completeResume.basics?.summary} ${"Detailed professional summary. ".repeat(8)}`,
+  },
   work: Array.from({ length: 14 }, (_, index) => ({
     ...baseWork,
     name: `Company ${String(index + 1).padStart(2, "0")}`,
     startDate: `${2010 + index}`,
     endDate: `${2011 + index}`,
-    highlights: Array.from({ length: index === 0 ? 45 : 5 }, (__, highlight) => `Delivered measurable result ${highlight + 1} for engagement ${index + 1}.`),
+    highlights: Array.from(
+      { length: index === 0 ? 45 : 5 },
+      (__, highlight) =>
+        `Delivered measurable result ${highlight + 1} for engagement ${index + 1}.`,
+    ),
   })),
 };
 ```
@@ -555,7 +680,11 @@ export const longResume: Resume = {
 Append to `tests/unit/resume-validator.test.ts`:
 
 ```ts
-import { completeResume, longResume, shortResume } from "../../src/resume-fixtures/resumes";
+import {
+  completeResume,
+  longResume,
+  shortResume,
+} from "../../src/resume-fixtures/resumes";
 
 it.each([
   ["short", shortResume],
@@ -577,7 +706,10 @@ Create `tests/unit/formatting.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { formatDateRange, formatLocation } from "../../src/resume/domain/formatting";
+import {
+  formatDateRange,
+  formatLocation,
+} from "../../src/resume/domain/formatting";
 
 describe("resume formatting", () => {
   it("formats open and closed date ranges without inventing dates", () => {
@@ -587,7 +719,9 @@ describe("resume formatting", () => {
   });
 
   it("joins only populated location parts", () => {
-    expect(formatLocation({ city: "Madrid", region: "Madrid", countryCode: "ES" })).toBe("Madrid, Madrid, ES");
+    expect(
+      formatLocation({ city: "Madrid", region: "Madrid", countryCode: "ES" }),
+    ).toBe("Madrid, Madrid, ES");
   });
 });
 ```
@@ -605,14 +739,19 @@ import type { Resume } from "./generated/resume";
 
 type Location = NonNullable<NonNullable<Resume["basics"]>["location"]>;
 
-export const formatDateRange = (startDate?: string, endDate?: string): string => {
+export const formatDateRange = (
+  startDate?: string,
+  endDate?: string,
+): string => {
   if (!startDate && !endDate) return "";
   if (!startDate) return endDate ?? "";
   return `${startDate} – ${endDate || "Present"}`;
 };
 
 export const formatLocation = (location?: Location): string =>
-  [location?.city, location?.region, location?.countryCode].filter(Boolean).join(", ");
+  [location?.city, location?.region, location?.countryCode]
+    .filter(Boolean)
+    .join(", ");
 ```
 
 Run `npm test -- tests/unit/formatting.test.ts`.
@@ -629,11 +768,26 @@ import { describe, expect, it } from "vitest";
 import { ResumeDocument } from "../../src/resume-templates/shared/ResumeDocument";
 import { completeResume, shortResume } from "../../src/resume-fixtures/resumes";
 
-const headings = ["Profile", "Experience", "Volunteer", "Education", "Awards", "Certificates", "Publications", "Skills", "Languages", "Interests", "References", "Projects"];
+const headings = [
+  "Profile",
+  "Experience",
+  "Volunteer",
+  "Education",
+  "Awards",
+  "Certificates",
+  "Publications",
+  "Skills",
+  "Languages",
+  "Interests",
+  "References",
+  "Projects",
+];
 
 describe("ResumeDocument", () => {
   it("renders every human-facing section in a stable linear order", () => {
-    const html = renderToStaticMarkup(<ResumeDocument resume={completeResume} />);
+    const html = renderToStaticMarkup(
+      <ResumeDocument resume={completeResume} />,
+    );
     const positions = headings.map((heading) => html.indexOf(`>${heading}<`));
 
     expect(positions.every((position) => position >= 0)).toBe(true);
@@ -663,16 +817,41 @@ Create `src/resume-templates/shared/ResumeDocument.tsx`:
 
 ```tsx
 import type { ReactNode } from "react";
-import { formatDateRange, formatLocation } from "../../resume/domain/formatting";
+import {
+  formatDateRange,
+  formatLocation,
+} from "../../resume/domain/formatting";
 import type { Resume } from "../../resume/domain/generated/resume";
 
 type Props = { resume: Resume };
 type SectionProps = { title: string; children: ReactNode };
 
-const Section = ({ title, children }: SectionProps) => <section><h2>{title}</h2>{children}</section>;
-const List = ({ items }: { items: string[] | undefined }) => items?.length ? <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul> : null;
-const Link = ({ url, children }: { url: string | undefined; children: ReactNode }) => url ? <a href={url}>{children}</a> : <>{children}</>;
-const Entry = ({ children }: { children: ReactNode }) => <article className="resume-entry" data-entry>{children}</article>;
+const Section = ({ title, children }: SectionProps) => (
+  <section>
+    <h2>{title}</h2>
+    {children}
+  </section>
+);
+const List = ({ items }: { items: string[] | undefined }) =>
+  items?.length ? (
+    <ul>
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  ) : null;
+const Link = ({
+  url,
+  children,
+}: {
+  url: string | undefined;
+  children: ReactNode;
+}) => (url ? <a href={url}>{children}</a> : <>{children}</>);
+const Entry = ({ children }: { children: ReactNode }) => (
+  <article className="resume-entry" data-entry>
+    {children}
+  </article>
+);
 
 export function ResumeDocument({ resume }: Props) {
   const { basics } = resume;
@@ -682,36 +861,210 @@ export function ResumeDocument({ resume }: Props) {
         <h1>{basics?.name}</h1>
         {basics?.label && <p className="resume-label">{basics.label}</p>}
         <address>
-          {[formatLocation(basics?.location), basics?.phone].filter(Boolean).map((value) => <span key={value}>{value}</span>)}
-          {basics?.email && <a href={`mailto:${basics.email}`}>{basics.email}</a>}
+          {[formatLocation(basics?.location), basics?.phone]
+            .filter(Boolean)
+            .map((value) => (
+              <span key={value}>{value}</span>
+            ))}
+          {basics?.email && (
+            <a href={`mailto:${basics.email}`}>{basics.email}</a>
+          )}
           {basics?.url && <a href={basics.url}>{basics.url}</a>}
-          {basics?.profiles?.map((profile) => <Link key={profile.url ?? profile.network} url={profile.url}>{profile.network}: {profile.username}</Link>)}
+          {basics?.profiles?.map((profile) => (
+            <Link key={profile.url ?? profile.network} url={profile.url}>
+              {profile.network}: {profile.username}
+            </Link>
+          ))}
         </address>
       </header>
 
-      {basics?.summary && <Section title="Profile"><p>{basics.summary}</p></Section>}
+      {basics?.summary && (
+        <Section title="Profile">
+          <p>{basics.summary}</p>
+        </Section>
+      )}
 
-      {!!resume.work?.length && <Section title="Experience">{resume.work.map((item, index) => <Entry key={`${item.name}-${index}`}><h3>{item.position} · <Link url={item.url}>{item.name}</Link></h3><p className="entry-meta">{[formatDateRange(item.startDate, item.endDate), item.location].filter(Boolean).join(" · ")}</p>{item.summary && <p>{item.summary}</p>}<List items={item.highlights} /></Entry>)}</Section>}
+      {!!resume.work?.length && (
+        <Section title="Experience">
+          {resume.work.map((item, index) => (
+            <Entry key={`${item.name}-${index}`}>
+              <h3>
+                {item.position} · <Link url={item.url}>{item.name}</Link>
+              </h3>
+              <p className="entry-meta">
+                {[formatDateRange(item.startDate, item.endDate), item.location]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+              {item.summary && <p>{item.summary}</p>}
+              <List items={item.highlights} />
+            </Entry>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.volunteer?.length && <Section title="Volunteer">{resume.volunteer.map((item, index) => <Entry key={`${item.organization}-${index}`}><h3>{item.position} · <Link url={item.url}>{item.organization}</Link></h3><p className="entry-meta">{formatDateRange(item.startDate, item.endDate)}</p>{item.summary && <p>{item.summary}</p>}<List items={item.highlights} /></Entry>)}</Section>}
+      {!!resume.volunteer?.length && (
+        <Section title="Volunteer">
+          {resume.volunteer.map((item, index) => (
+            <Entry key={`${item.organization}-${index}`}>
+              <h3>
+                {item.position} ·{" "}
+                <Link url={item.url}>{item.organization}</Link>
+              </h3>
+              <p className="entry-meta">
+                {formatDateRange(item.startDate, item.endDate)}
+              </p>
+              {item.summary && <p>{item.summary}</p>}
+              <List items={item.highlights} />
+            </Entry>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.education?.length && <Section title="Education">{resume.education.map((item, index) => <Entry key={`${item.institution}-${index}`}><h3>{item.studyType} {item.area} · <Link url={item.url}>{item.institution}</Link></h3><p className="entry-meta">{formatDateRange(item.startDate, item.endDate)}{item.score ? ` · ${item.score}` : ""}</p><List items={item.courses} /></Entry>)}</Section>}
+      {!!resume.education?.length && (
+        <Section title="Education">
+          {resume.education.map((item, index) => (
+            <Entry key={`${item.institution}-${index}`}>
+              <h3>
+                {item.studyType} {item.area} ·{" "}
+                <Link url={item.url}>{item.institution}</Link>
+              </h3>
+              <p className="entry-meta">
+                {formatDateRange(item.startDate, item.endDate)}
+                {item.score ? ` · ${item.score}` : ""}
+              </p>
+              <List items={item.courses} />
+            </Entry>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.awards?.length && <Section title="Awards">{resume.awards.map((item, index) => <Entry key={`${item.title}-${index}`}><h3>{item.title}</h3><p className="entry-meta">{[item.awarder, item.date].filter(Boolean).join(" · ")}</p>{item.summary && <p>{item.summary}</p>}</Entry>)}</Section>}
+      {!!resume.awards?.length && (
+        <Section title="Awards">
+          {resume.awards.map((item, index) => (
+            <Entry key={`${item.title}-${index}`}>
+              <h3>{item.title}</h3>
+              <p className="entry-meta">
+                {[item.awarder, item.date].filter(Boolean).join(" · ")}
+              </p>
+              {item.summary && <p>{item.summary}</p>}
+            </Entry>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.certificates?.length && <Section title="Certificates">{resume.certificates.map((item, index) => <Entry key={`${item.name}-${index}`}><h3><Link url={item.url}>{item.name}</Link></h3><p className="entry-meta">{[item.issuer, item.date].filter(Boolean).join(" · ")}</p></Entry>)}</Section>}
+      {!!resume.certificates?.length && (
+        <Section title="Certificates">
+          {resume.certificates.map((item, index) => (
+            <Entry key={`${item.name}-${index}`}>
+              <h3>
+                <Link url={item.url}>{item.name}</Link>
+              </h3>
+              <p className="entry-meta">
+                {[item.issuer, item.date].filter(Boolean).join(" · ")}
+              </p>
+            </Entry>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.publications?.length && <Section title="Publications">{resume.publications.map((item, index) => <Entry key={`${item.name}-${index}`}><h3><Link url={item.url}>{item.name}</Link></h3><p className="entry-meta">{[item.publisher, item.releaseDate].filter(Boolean).join(" · ")}</p>{item.summary && <p>{item.summary}</p>}</Entry>)}</Section>}
+      {!!resume.publications?.length && (
+        <Section title="Publications">
+          {resume.publications.map((item, index) => (
+            <Entry key={`${item.name}-${index}`}>
+              <h3>
+                <Link url={item.url}>{item.name}</Link>
+              </h3>
+              <p className="entry-meta">
+                {[item.publisher, item.releaseDate].filter(Boolean).join(" · ")}
+              </p>
+              {item.summary && <p>{item.summary}</p>}
+            </Entry>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.skills?.length && <Section title="Skills">{resume.skills.map((item, index) => <Entry key={`${item.name}-${index}`}><h3>{item.name}{item.level ? ` · ${item.level}` : ""}</h3>{item.keywords?.length ? <p>{item.keywords.join(" · ")}</p> : null}</Entry>)}</Section>}
+      {!!resume.skills?.length && (
+        <Section title="Skills">
+          {resume.skills.map((item, index) => (
+            <Entry key={`${item.name}-${index}`}>
+              <h3>
+                {item.name}
+                {item.level ? ` · ${item.level}` : ""}
+              </h3>
+              {item.keywords?.length ? (
+                <p>{item.keywords.join(" · ")}</p>
+              ) : null}
+            </Entry>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.languages?.length && <Section title="Languages">{resume.languages.map((item, index) => <p key={`${item.language}-${index}`}><strong>{item.language}</strong>{item.fluency ? ` · ${item.fluency}` : ""}</p>)}</Section>}
+      {!!resume.languages?.length && (
+        <Section title="Languages">
+          {resume.languages.map((item, index) => (
+            <p key={`${item.language}-${index}`}>
+              <strong>{item.language}</strong>
+              {item.fluency ? ` · ${item.fluency}` : ""}
+            </p>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.interests?.length && <Section title="Interests">{resume.interests.map((item, index) => <p key={`${item.name}-${index}`}><strong>{item.name}</strong>{item.keywords?.length ? ` · ${item.keywords.join(" · ")}` : ""}</p>)}</Section>}
+      {!!resume.interests?.length && (
+        <Section title="Interests">
+          {resume.interests.map((item, index) => (
+            <p key={`${item.name}-${index}`}>
+              <strong>{item.name}</strong>
+              {item.keywords?.length ? ` · ${item.keywords.join(" · ")}` : ""}
+            </p>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.references?.length && <Section title="References">{resume.references.map((item, index) => <blockquote key={`${item.name}-${index}`}><p>{item.reference}</p><cite>{item.name}</cite></blockquote>)}</Section>}
+      {!!resume.references?.length && (
+        <Section title="References">
+          {resume.references.map((item, index) => (
+            <blockquote key={`${item.name}-${index}`}>
+              <p>{item.reference}</p>
+              <cite>{item.name}</cite>
+            </blockquote>
+          ))}
+        </Section>
+      )}
 
-      {!!resume.projects?.length && <Section title="Projects">{resume.projects.map((item, index) => <Entry key={`${item.name}-${index}`}><h3><Link url={item.url}>{item.name}</Link></h3><p className="entry-meta">{[formatDateRange(item.startDate, item.endDate), item.entity, item.type].filter(Boolean).join(" · ")}</p>{item.description && <p>{item.description}</p>}<List items={item.highlights} />{item.roles?.length ? <p><strong>Roles:</strong> {item.roles.join(", ")}</p> : null}{item.keywords?.length ? <p><strong>Keywords:</strong> {item.keywords.join(", ")}</p> : null}</Entry>)}</Section>}
+      {!!resume.projects?.length && (
+        <Section title="Projects">
+          {resume.projects.map((item, index) => (
+            <Entry key={`${item.name}-${index}`}>
+              <h3>
+                <Link url={item.url}>{item.name}</Link>
+              </h3>
+              <p className="entry-meta">
+                {[
+                  formatDateRange(item.startDate, item.endDate),
+                  item.entity,
+                  item.type,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+              {item.description && <p>{item.description}</p>}
+              <List items={item.highlights} />
+              {item.roles?.length ? (
+                <p>
+                  <strong>Roles:</strong> {item.roles.join(", ")}
+                </p>
+              ) : null}
+              {item.keywords?.length ? (
+                <p>
+                  <strong>Keywords:</strong> {item.keywords.join(", ")}
+                </p>
+              ) : null}
+            </Entry>
+          ))}
+        </Section>
+      )}
     </article>
   );
 }
@@ -739,6 +1092,7 @@ git commit -m "feat: render complete semantic resume document"
 ### Task 4: Add Three Templates and A4 Print Routes
 
 **Files:**
+
 - Create: `src/resume-templates/domain/resume-template.ts`
 - Create: `src/resume-templates/editorial/EditorialTemplate.tsx`
 - Create: `src/resume-templates/minimal/MinimalTemplate.tsx`
@@ -750,6 +1104,7 @@ git commit -m "feat: render complete semantic resume document"
 - Modify: `tests/unit/resume-document.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `ResumeDocument`, `shortResume`, `completeResume`, and `longResume`.
 - Produces: `TemplateId`, `ResumeTemplateComponent`, `templateRegistry`, and nine static feasibility URLs.
 
@@ -794,7 +1149,11 @@ Create `src/resume-templates/editorial/EditorialTemplate.tsx`:
 import type { ResumeTemplateProps } from "../domain/resume-template";
 import { ResumeDocument } from "../shared/ResumeDocument";
 
-export const EditorialTemplate = ({ resume }: ResumeTemplateProps) => <div className="resume-page theme-editorial"><ResumeDocument resume={resume} /></div>;
+export const EditorialTemplate = ({ resume }: ResumeTemplateProps) => (
+  <div className="resume-page theme-editorial">
+    <ResumeDocument resume={resume} />
+  </div>
+);
 ```
 
 Create `src/resume-templates/minimal/MinimalTemplate.tsx`:
@@ -803,7 +1162,11 @@ Create `src/resume-templates/minimal/MinimalTemplate.tsx`:
 import type { ResumeTemplateProps } from "../domain/resume-template";
 import { ResumeDocument } from "../shared/ResumeDocument";
 
-export const MinimalTemplate = ({ resume }: ResumeTemplateProps) => <div className="resume-page theme-minimal"><ResumeDocument resume={resume} /></div>;
+export const MinimalTemplate = ({ resume }: ResumeTemplateProps) => (
+  <div className="resume-page theme-minimal">
+    <ResumeDocument resume={resume} />
+  </div>
+);
 ```
 
 Create `src/resume-templates/professional/ProfessionalTemplate.tsx`:
@@ -812,7 +1175,11 @@ Create `src/resume-templates/professional/ProfessionalTemplate.tsx`:
 import type { ResumeTemplateProps } from "../domain/resume-template";
 import { ResumeDocument } from "../shared/ResumeDocument";
 
-export const ProfessionalTemplate = ({ resume }: ResumeTemplateProps) => <div className="resume-page theme-professional"><ResumeDocument resume={resume} /></div>;
+export const ProfessionalTemplate = ({ resume }: ResumeTemplateProps) => (
+  <div className="resume-page theme-professional">
+    <ResumeDocument resume={resume} />
+  </div>
+);
 ```
 
 Create `src/resume-templates/template-registry.ts`:
@@ -821,7 +1188,10 @@ Create `src/resume-templates/template-registry.ts`:
 import { EditorialTemplate } from "./editorial/EditorialTemplate";
 import { MinimalTemplate } from "./minimal/MinimalTemplate";
 import { ProfessionalTemplate } from "./professional/ProfessionalTemplate";
-import type { ResumeTemplateComponent, TemplateId } from "./domain/resume-template";
+import type {
+  ResumeTemplateComponent,
+  TemplateId,
+} from "./domain/resume-template";
 
 export const templateRegistry: Record<TemplateId, ResumeTemplateComponent> = {
   editorial: EditorialTemplate,
@@ -835,18 +1205,42 @@ export const templateRegistry: Record<TemplateId, ResumeTemplateComponent> = {
 Create `src/shared/styles/global.css`:
 
 ```css
-:root { font-family: Arial, Helvetica, sans-serif; color: #172033; background: #e9edf2; }
-* { box-sizing: border-box; }
-body { margin: 0; }
-a { color: inherit; text-decoration-thickness: 0.08em; text-underline-offset: 0.12em; }
-.feasibility-toolbar { position: sticky; top: 0; z-index: 2; padding: 0.75rem 1rem; color: white; background: #172033; }
-.preview-surface { padding: 2rem; }
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #172033;
+  background: #e9edf2;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+a {
+  color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.12em;
+}
+.feasibility-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.75rem 1rem;
+  color: white;
+  background: #172033;
+}
+.preview-surface {
+  padding: 2rem;
+}
 ```
 
 Create `src/resume-templates/template.css`:
 
 ```css
-@page { size: A4; margin: 14mm 15mm 16mm; }
+@page {
+  size: A4;
+  margin: 14mm 15mm 16mm;
+}
 
 .resume-page {
   width: 210mm;
@@ -859,37 +1253,117 @@ Create `src/resume-templates/template.css`:
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;
 }
-.resume-document { font-size: 10pt; line-height: 1.42; }
-.resume-document h1 { margin: 0; font-size: 24pt; line-height: 1.05; }
-.resume-label { margin: 0.3rem 0 0.6rem; font-size: 12pt; }
-.resume-document address { display: flex; flex-wrap: wrap; gap: 0.2rem 0.75rem; font-style: normal; }
-.resume-document section { margin-top: 1rem; }
-.resume-document h2 { margin: 0 0 0.45rem; padding-bottom: 0.18rem; font-size: 10pt; letter-spacing: 0.09em; text-transform: uppercase; border-bottom: 1px solid currentColor; break-after: avoid; }
-.resume-document h3 { margin: 0; font-size: 10.5pt; break-after: avoid; }
-.resume-document p { margin: 0.22rem 0; }
-.resume-document ul { margin: 0.25rem 0; padding-left: 1.15rem; }
-.resume-entry { margin-top: 0.55rem; break-inside: avoid; }
-.entry-meta { color: #4b5563; }
-.resume-document blockquote { margin: 0.5rem 0; padding-left: 0.75rem; border-left: 2px solid currentColor; break-inside: avoid; }
+.resume-document {
+  font-size: 10pt;
+  line-height: 1.42;
+}
+.resume-document h1 {
+  margin: 0;
+  font-size: 24pt;
+  line-height: 1.05;
+}
+.resume-label {
+  margin: 0.3rem 0 0.6rem;
+  font-size: 12pt;
+}
+.resume-document address {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+  font-style: normal;
+}
+.resume-document section {
+  margin-top: 1rem;
+}
+.resume-document h2 {
+  margin: 0 0 0.45rem;
+  padding-bottom: 0.18rem;
+  font-size: 10pt;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  border-bottom: 1px solid currentColor;
+  break-after: avoid;
+}
+.resume-document h3 {
+  margin: 0;
+  font-size: 10.5pt;
+  break-after: avoid;
+}
+.resume-document p {
+  margin: 0.22rem 0;
+}
+.resume-document ul {
+  margin: 0.25rem 0;
+  padding-left: 1.15rem;
+}
+.resume-entry {
+  margin-top: 0.55rem;
+  break-inside: avoid;
+}
+.entry-meta {
+  color: #4b5563;
+}
+.resume-document blockquote {
+  margin: 0.5rem 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid currentColor;
+  break-inside: avoid;
+}
 
-.theme-editorial { border-top: 5mm solid #163c64; }
-.theme-editorial h1, .theme-editorial h2 { color: #163c64; }
-.theme-minimal { font-family: Arial, Helvetica, sans-serif; }
-.theme-minimal h2 { color: #111827; border-bottom-width: 1px; }
-.theme-professional { font-family: Georgia, "Times New Roman", serif; }
-.theme-professional h1 { color: #303b4f; }
-.theme-professional h2 { color: #303b4f; border-bottom: 2px solid #8793a5; }
+.theme-editorial {
+  border-top: 5mm solid #163c64;
+}
+.theme-editorial h1,
+.theme-editorial h2 {
+  color: #163c64;
+}
+.theme-minimal {
+  font-family: Arial, Helvetica, sans-serif;
+}
+.theme-minimal h2 {
+  color: #111827;
+  border-bottom-width: 1px;
+}
+.theme-professional {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.theme-professional h1 {
+  color: #303b4f;
+}
+.theme-professional h2 {
+  color: #303b4f;
+  border-bottom: 2px solid #8793a5;
+}
 
 @media print {
-  :root, body { color: #172033; background: white; }
-  .feasibility-toolbar { display: none !important; }
-  .preview-surface { padding: 0; }
-  .resume-page { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+  :root,
+  body {
+    color: #172033;
+    background: white;
+  }
+  .feasibility-toolbar {
+    display: none !important;
+  }
+  .preview-surface {
+    padding: 0;
+  }
+  .resume-page {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
 }
 
 @media screen and (max-width: 800px) {
-  .preview-surface { padding: 0.75rem; overflow-x: auto; }
-  .resume-page { transform-origin: top left; }
+  .preview-surface {
+    padding: 0.75rem;
+    overflow-x: auto;
+  }
+  .resume-page {
+    transform-origin: top left;
+  }
 }
 ```
 
@@ -901,12 +1375,23 @@ Create `src/pages/feasibility/[template]/[fixture].astro`:
 ---
 import "../../../shared/styles/global.css";
 import "../../../resume-templates/template.css";
-import { templateIds, type TemplateId } from "../../../resume-templates/domain/resume-template";
+import {
+  templateIds,
+  type TemplateId,
+} from "../../../resume-templates/domain/resume-template";
 import { templateRegistry } from "../../../resume-templates/template-registry";
-import { completeResume, longResume, shortResume } from "../../../resume-fixtures/resumes";
+import {
+  completeResume,
+  longResume,
+  shortResume,
+} from "../../../resume-fixtures/resumes";
 import type { Resume } from "../../../resume/domain/generated/resume";
 
-const fixtureRegistry = { short: shortResume, complete: completeResume, long: longResume } satisfies Record<string, Resume>;
+const fixtureRegistry = {
+  short: shortResume,
+  complete: completeResume,
+  long: longResume,
+} satisfies Record<string, Resume>;
 type FixtureId = keyof typeof fixtureRegistry;
 
 export function getStaticPaths() {
@@ -932,8 +1417,14 @@ const resume = fixtureRegistry[fixture];
     <title>{template} / {fixture} PDF fixture</title>
   </head>
   <body>
-    <nav class="feasibility-toolbar"><a href="/">Fixtures</a> · {template} · {fixture}</nav>
-    <main class="preview-surface" data-template={template} data-fixture={fixture}>
+    <nav class="feasibility-toolbar">
+      <a href="/">Fixtures</a> · {template} · {fixture}
+    </nav>
+    <main
+      class="preview-surface"
+      data-template={template}
+      data-fixture={fixture}
+    >
       <Template resume={resume} />
     </main>
   </body>
@@ -973,12 +1464,14 @@ git commit -m "feat: add ats-safe a4 resume templates"
 ### Task 5: Automate the Chromium PDF Contract
 
 **Files:**
+
 - Create: `playwright.config.ts`
 - Create: `tests/pdf/extract-pdf.ts`
 - Create: `tests/pdf/pdf-feasibility.spec.ts`
 - Modify: `package.json`
 
 **Interfaces:**
+
 - Consumes: nine static feasibility routes.
 - Produces: `extractPdf(buffer)` returning page text and link targets, plus `npm run test:pdf`.
 
@@ -1034,15 +1527,35 @@ import { expect, test, type Page } from "@playwright/test";
 import { extractPdf } from "./extract-pdf";
 
 const templates = ["editorial", "minimal", "professional"] as const;
-const sectionOrder = ["Profile", "Experience", "Volunteer", "Education", "Awards", "Certificates", "Publications", "Skills", "Languages", "Interests", "References", "Projects"];
+const sectionOrder = [
+  "Profile",
+  "Experience",
+  "Volunteer",
+  "Education",
+  "Awards",
+  "Certificates",
+  "Publications",
+  "Skills",
+  "Languages",
+  "Interests",
+  "References",
+  "Projects",
+];
 
 const createPdf = async (page: Page, path: string) => {
   await page.goto(path);
-  return page.pdf({ format: "A4", preferCSSPageSize: true, printBackground: true, tagged: true });
+  return page.pdf({
+    format: "A4",
+    preferCSSPageSize: true,
+    printBackground: true,
+    tagged: true,
+  });
 };
 
 for (const template of templates) {
-  test(`${template}: short resume is one selectable-text page`, async ({ page }) => {
+  test(`${template}: short resume is one selectable-text page`, async ({
+    page,
+  }) => {
     const pdf = await createPdf(page, `/feasibility/${template}/short`);
     const result = await extractPdf(pdf);
     expect(result.pageTexts).toHaveLength(1);
@@ -1050,14 +1563,20 @@ for (const template of templates) {
     expect(result.pageTexts[0]).toContain("Improved Core Web Vitals");
   });
 
-  test(`${template}: complete resume preserves sections, order, and links`, async ({ page }) => {
+  test(`${template}: complete resume preserves sections, order, and links`, async ({
+    page,
+  }) => {
     const pdf = await createPdf(page, `/feasibility/${template}/complete`);
     const result = await extractPdf(pdf);
-    const repeatedResult = await extractPdf(await createPdf(page, `/feasibility/${template}/complete`));
+    const repeatedResult = await extractPdf(
+      await createPdf(page, `/feasibility/${template}/complete`),
+    );
     const text = result.pageTexts.join(" ");
     const positions = sectionOrder.map((heading) => text.indexOf(heading));
 
-    expect(result.pageTexts.every((pageText) => pageText.length > 0)).toBe(true);
+    expect(result.pageTexts.every((pageText) => pageText.length > 0)).toBe(
+      true,
+    );
     expect(positions.every((position) => position >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
     expect(text).not.toContain("photo.png");
@@ -1066,13 +1585,17 @@ for (const template of templates) {
     expect(repeatedResult).toEqual(result);
   });
 
-  test(`${template}: long resume paginates without blank pages or missing entries`, async ({ page }) => {
+  test(`${template}: long resume paginates without blank pages or missing entries`, async ({
+    page,
+  }) => {
     const pdf = await createPdf(page, `/feasibility/${template}/long`);
     const result = await extractPdf(pdf);
     const text = result.pageTexts.join(" ");
 
     expect(result.pageTexts.length).toBeGreaterThanOrEqual(3);
-    expect(result.pageTexts.every((pageText) => pageText.length > 40)).toBe(true);
+    expect(result.pageTexts.every((pageText) => pageText.length > 40)).toBe(
+      true,
+    );
     for (let index = 1; index <= 14; index += 1) {
       expect(text).toContain(`Company ${String(index).padStart(2, "0")}`);
     }
@@ -1117,7 +1640,11 @@ export async function extractPdf(buffer: Buffer): Promise<PdfExtraction> {
     const annotations = await page.getAnnotations();
 
     pageTexts.push(text);
-    links.push(...annotations.flatMap((annotation) => typeof annotation.url === "string" ? [annotation.url] : []));
+    links.push(
+      ...annotations.flatMap((annotation) =>
+        typeof annotation.url === "string" ? [annotation.url] : [],
+      ),
+    );
   }
 
   await document.destroy();
@@ -1157,9 +1684,11 @@ git commit -m "test: verify chromium pdf contract"
 ### Task 6: Execute the Native Chrome Gate and Record the Decision
 
 **Files:**
+
 - Create after a successful gate: `docs/quality/pdf-feasibility-result.md`
 
 **Interfaces:**
+
 - Consumes: passing `npm run test:all` and Chrome's native print dialog.
 - Produces: an explicit `PASS` decision permitting the separate editor implementation plan.
 

@@ -16,6 +16,16 @@ const sectionOrder = [
   "References",
   "Projects",
 ];
+const expectedExternalLinks = [
+  "https://example.com/",
+  "https://example.com/acme",
+  "https://example.com/article",
+  "https://example.com/certificate",
+  "https://example.com/foundation",
+  "https://example.com/ui-kit",
+  "https://example.com/university",
+  "https://linkedin.com/in/alex",
+];
 
 const createPdf = async (page: Page, path: string) => {
   await page.goto(path);
@@ -62,7 +72,21 @@ for (const template of templates) {
     expect(text).not.toContain("https://example.com/resume.json");
     expect(text).not.toContain("v1.0.0");
     expect(text).not.toContain("2026-07-14T10:00:00");
-    expect(result.links).toContain("https://example.com/ui-kit");
+    expect(
+      result.links.filter((link) => link.startsWith("http")).sort(),
+    ).toEqual(expectedExternalLinks);
+    expect(result.pages).toHaveLength(result.pageTexts.length);
+    expect(
+      result.pages.every(
+        (pdfPage) =>
+          pdfPage.width > 0 &&
+          pdfPage.height > 0 &&
+          pdfPage.textItems.length > 0 &&
+          pdfPage.linkAnnotations.every(
+            (annotation) => annotation.rect.length === 4,
+          ),
+      ),
+    ).toBe(true);
     expect(repeatedResult).toEqual(result);
   });
 

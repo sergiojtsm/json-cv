@@ -10,7 +10,8 @@ const schemaPath = require.resolve("@jsonresume/schema/schema.json");
 const outputPath = resolve(root, "src/resume/domain/generated/resume.ts");
 const schema = JSON.parse(await readFile(schemaPath, "utf8"));
 const source = await compile({ ...schema, title: "Resume" }, "Resume", {
-  bannerComment: "/* Generated from @jsonresume/schema@1.3.0. Do not edit manually. */",
+  bannerComment:
+    "/* Generated from @jsonresume/schema@1.3.0. Do not edit manually. */",
   additionalProperties: true,
   style: { singleQuote: false, semi: true, tabWidth: 2 },
 });

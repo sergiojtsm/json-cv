@@ -57,6 +57,7 @@ export const completeResume: Resume = {
       position: "Senior Frontend Engineer",
       url: "https://example.com/acme",
       startDate: "2022-03",
+      description: "Customer platform engineering team.",
       summary: "Leads frontend architecture.",
       highlights: ["Reduced load time by 40%.", "Mentored six engineers."],
     },

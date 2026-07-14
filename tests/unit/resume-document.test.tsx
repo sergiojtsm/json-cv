@@ -72,9 +72,89 @@ describe("ResumeDocument", () => {
       ),
     ).toEqual(headings);
     expect(html).not.toContain("photo.png");
+    expect(html).not.toContain("resume-schema/master/schema.json");
     expect(html).not.toContain("canonical");
+    expect(html).not.toContain("v1.0.0");
+    expect(html).not.toContain("2026-07-14T10:00:00");
     expect(html).toContain('href="mailto:alex@example.com"');
     expect(html).toContain('href="https://example.com/ui-kit"');
+  });
+
+  it.each([
+    ["basics.name", "Alex Morgan"],
+    ["basics.label", "Senior Frontend Engineer"],
+    ["basics.email", "alex@example.com"],
+    ["basics.phone", "+34 600 000 000"],
+    ["basics.url", "https://example.com"],
+    ["basics.summary", "Frontend engineer with seven years"],
+    ["basics.location.address", "Calle Mayor 1"],
+    ["basics.location.postalCode", "28001"],
+    ["basics.location.city", "Madrid"],
+    ["basics.location.region", "Madrid"],
+    ["basics.location.countryCode", "ES"],
+    ["basics.profiles.network", "LinkedIn"],
+    ["basics.profiles.username", "alex"],
+    ["basics.profiles.url", "https://linkedin.com/in/alex"],
+    ["work.name", "Acme"],
+    ["work.location", "Madrid"],
+    ["work.position", "Senior Frontend Engineer"],
+    ["work.url", "https://example.com/acme"],
+    ["work.startDate", "2022-03"],
+    ["work.description", "Customer platform engineering team."],
+    ["work.summary", "Leads frontend architecture."],
+    ["work.highlights", "Reduced load time by 40%."],
+    ["volunteer.organization", "Open Web Foundation"],
+    ["volunteer.position", "Mentor"],
+    ["volunteer.url", "https://example.com/foundation"],
+    ["volunteer.startDate", "2021"],
+    ["volunteer.summary", "Mentors junior developers."],
+    ["volunteer.highlights", "Delivered twelve workshops."],
+    ["education.institution", "Technical University"],
+    ["education.url", "https://example.com/university"],
+    ["education.area", "Computer Science"],
+    ["education.studyType", "BSc"],
+    ["education.startDate", "2012"],
+    ["education.endDate", "2016"],
+    ["education.score", "8.7/10"],
+    ["education.courses", "Distributed Systems"],
+    ["awards.title", "Accessibility Champion"],
+    ["awards.date", "2024"],
+    ["awards.awarder", "Web Guild"],
+    ["awards.summary", "Recognized for accessible product leadership."],
+    ["certificates.name", "Web Accessibility Specialist"],
+    ["certificates.date", "2023-04"],
+    ["certificates.issuer", "IAAP"],
+    ["certificates.url", "https://example.com/certificate"],
+    ["publications.name", "Design Systems at Scale"],
+    ["publications.publisher", "Frontend Journal"],
+    ["publications.releaseDate", "2023-09"],
+    ["publications.url", "https://example.com/article"],
+    ["publications.summary", "A practical guide to federated design systems."],
+    ["skills.name", "Frontend"],
+    ["skills.level", "Expert"],
+    ["skills.keywords", "Accessibility"],
+    ["languages.language", "Spanish"],
+    ["languages.fluency", "Professional"],
+    ["interests.name", "Open source"],
+    ["interests.keywords", "Developer tools"],
+    ["references.name", "Jordan Lee"],
+    ["references.reference", "Alex consistently delivers clear"],
+    ["projects.name", "Accessible UI Kit"],
+    ["projects.description", "An open-source component library."],
+    ["projects.highlights", "Used by four product teams."],
+    ["projects.keywords", "ARIA"],
+    ["projects.startDate", "2021"],
+    ["projects.endDate", "2024"],
+    ["projects.url", "https://example.com/ui-kit"],
+    ["projects.roles", "Maintainer"],
+    ["projects.entity", "Open Web Foundation"],
+    ["projects.type", "open-source"],
+  ])("evidences populated human-facing field %s", (_field, evidence) => {
+    const html = renderToStaticMarkup(
+      <ResumeDocument resume={completeResume} />,
+    );
+
+    expect(html).toContain(evidence);
   });
 
   it("omits headings for absent sections", () => {
@@ -82,6 +162,35 @@ describe("ResumeDocument", () => {
     expect(html).toContain(">Experience<");
     expect(html).not.toContain(">Awards<");
     expect(html).not.toContain(">References<");
+  });
+
+  it("omits every section and entry when arrays contain only empty valid items", () => {
+    const emptyCollectionsResume: Resume = {
+      basics: { profiles: [{}] },
+      work: [{}],
+      volunteer: [{}],
+      education: [{}],
+      awards: [{}],
+      certificates: [{}],
+      publications: [{}],
+      skills: [{}],
+      languages: [{}],
+      interests: [{}],
+      references: [{}],
+      projects: [{}],
+    };
+
+    expect(new AjvResumeValidator().validate(emptyCollectionsResume).ok).toBe(
+      true,
+    );
+
+    const html = renderToStaticMarkup(
+      <ResumeDocument resume={emptyCollectionsResume} />,
+    );
+
+    expect(html).toBe(
+      '<article class="resume-document" data-resume-document="true"></article>',
+    );
   });
 
   it("omits empty contact, entry headings, and metadata for sparse valid items", () => {

@@ -3,7 +3,10 @@ import addFormats from "ajv-formats";
 import resumeSchema from "@jsonresume/schema/schema.json";
 import type { Resume } from "../../../resume/domain/generated/resume";
 import type { ResumeValidator } from "../../application/ports/resume-validator";
-import type { ResumeValidationResult, ValidationDiagnostic } from "../../domain/validation-result";
+import type {
+  ResumeValidationResult,
+  ValidationDiagnostic,
+} from "../../domain/validation-result";
 
 const toDiagnostic = (error: ErrorObject): ValidationDiagnostic => ({
   path: error.instancePath || "/",
