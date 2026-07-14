@@ -98,9 +98,13 @@ for (const template of templates) {
     const text = result.pageTexts.join(" ");
     console.log(`${template}/long: ${result.pageTexts.length} page(s)`);
 
-    expect(result.pageTexts.length).toBeGreaterThanOrEqual(3);
+    expect(result.pageTexts).toHaveLength(5);
     expect(result.pageTexts.every((pageText) => pageText.length > 40)).toBe(
       true,
+    );
+    expect(result.pageTexts[0]).toContain("Company 01");
+    expect(result.pageTexts[1]).toContain(
+      "Delivered measurable result 45 for engagement 1",
     );
     for (let index = 1; index <= 14; index += 1) {
       expect(text).toContain(`Company ${String(index).padStart(2, "0")}`);

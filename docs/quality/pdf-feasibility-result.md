@@ -19,16 +19,16 @@
 - All nine Playwright Chromium PDF tests pass.
 - Short fixtures produce one page with selectable text.
 - Complete fixtures preserve every human-facing standard section, reading order, and links.
-- Long fixtures produce at least three non-empty pages without missing work entries.
+- Long fixtures produce exactly five non-empty pages without missing work entries.
 - Static Astro type-check and production build pass.
 
 ### Automated Page Counts
 
 | Template     | Short | Complete | Long |
 | ------------ | ----: | -------: | ---: |
-| Editorial    |     1 |        2 |    6 |
-| Minimal      |     1 |        2 |    6 |
-| Professional |     1 |        2 |    6 |
+| Editorial    |     1 |        2 |    5 |
+| Minimal      |     1 |        2 |    5 |
+| Professional |     1 |        2 |    5 |
 
 ## Native Print Evidence
 
