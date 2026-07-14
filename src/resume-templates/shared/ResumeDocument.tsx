@@ -18,8 +18,8 @@ const Section = ({ title, children }: SectionProps) => (
 const List = ({ items }: { items: string[] | undefined }) =>
   items?.length ? (
     <ul>
-      {items.map((item) => (
-        <li key={item}>{item}</li>
+      {items.map((item, index) => (
+        <li key={`${item}-${index}`}>{item}</li>
       ))}
     </ul>
   ) : null;
@@ -38,30 +38,69 @@ const Entry = ({ children }: { children: ReactNode }) => (
   </article>
 );
 
+const EntryHeading = ({
+  primary,
+  secondary,
+  secondaryUrl,
+}: {
+  primary: string | undefined;
+  secondary: string | undefined;
+  secondaryUrl: string | undefined;
+}) =>
+  primary || secondary ? (
+    <h3>
+      {primary}
+      {primary && secondary ? " · " : ""}
+      {secondary && <Link url={secondaryUrl}>{secondary}</Link>}
+    </h3>
+  ) : null;
+
+const EntryMeta = ({ parts }: { parts: (string | undefined)[] }) => {
+  const content = parts.filter(Boolean).join(" · ");
+  return content ? <p className="entry-meta">{content}</p> : null;
+};
+
 export function ResumeDocument({ resume }: Props) {
   const { basics } = resume;
+  const location = formatLocation(basics?.location);
+  const profiles =
+    basics?.profiles?.filter(
+      (profile) => profile.network || profile.username || profile.url,
+    ) ?? [];
+  const hasContact = Boolean(
+    location ||
+    basics?.phone ||
+    basics?.email ||
+    basics?.url ||
+    profiles.length,
+  );
 
   return (
     <article className="resume-document" data-resume-document>
       <header>
         <h1>{basics?.name}</h1>
         {basics?.label && <p className="resume-label">{basics.label}</p>}
-        <address>
-          {[formatLocation(basics?.location), basics?.phone]
-            .filter(Boolean)
-            .map((value) => (
-              <span key={value}>{value}</span>
+        {hasContact && (
+          <address>
+            {[location, basics?.phone].filter(Boolean).map((value, index) => (
+              <span key={`${value}-${index}`}>{value}</span>
             ))}
-          {basics?.email && (
-            <a href={`mailto:${basics.email}`}>{basics.email}</a>
-          )}
-          {basics?.url && <a href={basics.url}>{basics.url}</a>}
-          {basics?.profiles?.map((profile) => (
-            <Link key={profile.url ?? profile.network} url={profile.url}>
-              {profile.network}: {profile.username}
-            </Link>
-          ))}
-        </address>
+            {basics?.email && (
+              <a href={`mailto:${basics.email}`}>{basics.email}</a>
+            )}
+            {basics?.url && <a href={basics.url}>{basics.url}</a>}
+            {profiles.map((profile, index) => (
+              <Link
+                key={`${profile.url ?? profile.network ?? profile.username}-${index}`}
+                url={profile.url}
+              >
+                {[profile.network, profile.username]
+                  .filter(Boolean)
+                  .join(": ") || profile.url}
+              </Link>
+            ))}
+          </address>
+        )}
       </header>
 
       {basics?.summary && (
@@ -74,14 +113,17 @@ export function ResumeDocument({ resume }: Props) {
         <Section title="Experience">
           {resume.work.map((item, index) => (
             <Entry key={`${item.name}-${index}`}>
-              <h3>
-                {item.position} · <Link url={item.url}>{item.name}</Link>
-              </h3>
-              <p className="entry-meta">
-                {[formatDateRange(item.startDate, item.endDate), item.location]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </p>
+              <EntryHeading
+                primary={item.position}
+                secondary={item.name}
+                secondaryUrl={item.url}
+              />
+              <EntryMeta
+                parts={[
+                  formatDateRange(item.startDate, item.endDate),
+                  item.location,
+                ]}
+              />
               {item.summary && <p>{item.summary}</p>}
               <List items={item.highlights} />
             </Entry>
@@ -93,13 +135,14 @@ export function ResumeDocument({ resume }: Props) {
         <Section title="Volunteer">
           {resume.volunteer.map((item, index) => (
             <Entry key={`${item.organization}-${index}`}>
-              <h3>
-                {item.position} ·{" "}
-                <Link url={item.url}>{item.organization}</Link>
-              </h3>
-              <p className="entry-meta">
-                {formatDateRange(item.startDate, item.endDate)}
-              </p>
+              <EntryHeading
+                primary={item.position}
+                secondary={item.organization}
+                secondaryUrl={item.url}
+              />
+              <EntryMeta
+                parts={[formatDateRange(item.startDate, item.endDate)]}
+              />
               {item.summary && <p>{item.summary}</p>}
               <List items={item.highlights} />
             </Entry>
@@ -111,14 +154,17 @@ export function ResumeDocument({ resume }: Props) {
         <Section title="Education">
           {resume.education.map((item, index) => (
             <Entry key={`${item.institution}-${index}`}>
-              <h3>
-                {item.studyType} {item.area} ·{" "}
-                <Link url={item.url}>{item.institution}</Link>
-              </h3>
-              <p className="entry-meta">
-                {formatDateRange(item.startDate, item.endDate)}
-                {item.score ? ` · ${item.score}` : ""}
-              </p>
+              <EntryHeading
+                primary={[item.studyType, item.area].filter(Boolean).join(" ")}
+                secondary={item.institution}
+                secondaryUrl={item.url}
+              />
+              <EntryMeta
+                parts={[
+                  formatDateRange(item.startDate, item.endDate),
+                  item.score,
+                ]}
+              />
               <List items={item.courses} />
             </Entry>
           ))}

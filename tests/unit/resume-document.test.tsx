@@ -1,7 +1,13 @@
+// @vitest-environment jsdom
+
+import { act } from "react";
+import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { AjvResumeValidator } from "../../src/resume-editor/adapters/validation/ajv-resume-validator";
 import { completeResume, shortResume } from "../../src/resume-fixtures/resumes";
 import { ResumeDocument } from "../../src/resume-templates/shared/ResumeDocument";
+import type { Resume } from "../../src/resume/domain/generated/resume";
 
 const headings = [
   "Profile",
@@ -38,5 +44,62 @@ describe("ResumeDocument", () => {
     expect(html).toContain(">Experience<");
     expect(html).not.toContain(">Awards<");
     expect(html).not.toContain(">References<");
+  });
+
+  it("omits empty contact, entry headings, and metadata for sparse valid items", () => {
+    const sparseResume: Resume = {
+      basics: {},
+      work: [{}, { position: "Engineer" }],
+      volunteer: [{}, { organization: "Open Web" }],
+      education: [{}, { area: "Computer Science", score: "A" }],
+    };
+
+    expect(new AjvResumeValidator().validate(sparseResume).ok).toBe(true);
+
+    const html = renderToStaticMarkup(<ResumeDocument resume={sparseResume} />);
+
+    expect(html).not.toContain("<address>");
+    expect(html.match(/<h3>/g)).toHaveLength(3);
+    expect(html).toContain("<h3>Engineer</h3>");
+    expect(html).toContain("<h3>Open Web</h3>");
+    expect(html).toContain("<h3>Computer Science</h3>");
+    expect(html.match(/class="entry-meta"/g)).toHaveLength(1);
+    expect(html).toContain('<p class="entry-meta">A</p>');
+    expect(html).not.toContain(" · ");
+  });
+
+  it("renders duplicate highlights and profiles without React key warnings", () => {
+    const duplicateResume: Resume = {
+      basics: {
+        profiles: [
+          { network: "LinkedIn", username: "alex" },
+          { network: "LinkedIn", username: "alex" },
+        ],
+      },
+      work: [
+        {
+          highlights: ["Repeated result", "Repeated result"],
+        },
+      ],
+    };
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      act(() => {
+        root.render(<ResumeDocument resume={duplicateResume} />);
+      });
+      const keyWarnings = consoleError.mock.calls.filter(([message]) =>
+        String(message).includes("same key"),
+      );
+
+      expect(keyWarnings).toHaveLength(0);
+    } finally {
+      act(() => root.unmount());
+      consoleError.mockRestore();
+    }
   });
 });
