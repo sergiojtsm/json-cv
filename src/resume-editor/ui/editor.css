@@ -4,6 +4,9 @@
   color: #172033;
 }
 .editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   gap: 0.5rem;
   align-items: center;
@@ -26,11 +29,13 @@
 .editor-workspace {
   display: grid;
   grid-template-columns: minmax(22rem, 42%) minmax(0, 1fr);
-  min-height: calc(100vh - 4rem);
+  height: calc(100vh - 3.5rem);
+  overflow: hidden;
 }
 .editor-pane {
   position: relative;
   min-width: 0;
+  overflow-y: auto;
   background: #111827;
 }
 .editor-placeholder {
@@ -51,7 +56,7 @@
 }
 .preview-pane {
   min-width: 0;
-  overflow: auto;
+  overflow-y: auto;
   padding: 2rem;
 }
 .validation-panel {
@@ -106,6 +111,7 @@ button:disabled {
   .preview-pane {
     display: block;
     min-height: 0;
+    height: auto;
     padding: 0;
     overflow: visible;
     background: white;
