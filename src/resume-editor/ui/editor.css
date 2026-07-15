@@ -73,6 +73,9 @@ button:disabled {
   }
 }
 @media print {
+  astro-island {
+    display: block;
+  }
   .editor-toolbar,
   .editor-pane,
   .mobile-tabs,
