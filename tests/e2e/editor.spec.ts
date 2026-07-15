@@ -178,3 +178,16 @@ test("A4 preview fits the viewport width on mobile", async ({ page }) => {
   expect(box).not.toBeNull();
   expect(box!.width).toBeLessThanOrEqual(390);
 });
+
+test("print media renders full-size A4 preview on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".cm-content").click();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await page.getByRole("tab", { name: "Preview" }).click();
+  await page.emulateMedia({ media: "print" });
+  const zoom = await page
+    .locator(".resume-page")
+    .evaluate((el) => getComputedStyle(el).zoom);
+  // zoom resolves to "1" (or "normal") when reset for print
+  expect(["1", "normal"]).toContain(zoom);
+});
