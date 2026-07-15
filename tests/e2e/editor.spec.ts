@@ -148,3 +148,21 @@ test("surfaces validation errors through the toolbar badge", async ({
   await page.keyboard.press("Delete");
   await expect(badge).toHaveCount(0);
 });
+
+test("toolbar wraps and does not overlap the tabs on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const toolbar = page.locator(".editor-toolbar");
+  const tabs = page.locator(".mobile-tabs");
+  await expect(toolbar).toBeVisible();
+  await expect(tabs).toBeVisible();
+  const toolbarBox = await toolbar.boundingBox();
+  const tabsBox = await tabs.boundingBox();
+  expect(toolbarBox).not.toBeNull();
+  expect(tabsBox).not.toBeNull();
+  // The tabs start at or below the bottom of the (possibly wrapped) toolbar.
+  expect(tabsBox!.y).toBeGreaterThanOrEqual(
+    toolbarBox!.y + toolbarBox!.height - 1,
+  );
+});
