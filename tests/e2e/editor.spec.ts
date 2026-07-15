@@ -77,6 +77,24 @@ test("uses Editor and Preview tabs on mobile", async ({ page }) => {
   await expect(page.locator(".preview-pane")).not.toHaveCSS("display", "none");
 });
 
+test("preview pane scrolls independently on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".cm-content").click();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await page.getByRole("tab", { name: "Preview" }).click();
+  const pane = page.locator(".preview-pane");
+  await expect(pane).toBeVisible();
+  const canScroll = await pane.evaluate(
+    (el) => el.scrollHeight > el.clientHeight,
+  );
+  expect(canScroll).toBe(true);
+  await pane.evaluate((el) => {
+    el.scrollTop = 200;
+  });
+  const scrolled = await pane.evaluate((el) => el.scrollTop);
+  expect(scrolled).toBeGreaterThan(0);
+});
+
 test("loads example resume JSON", async ({ page }) => {
   const editor = page.locator(".cm-content");
   await editor.click();
