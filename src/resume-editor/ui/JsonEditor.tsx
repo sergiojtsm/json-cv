@@ -1,9 +1,12 @@
-import { useMemo } from "react";
-import CodeMirror from "@uiw/react-codemirror";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import CodeMirror, { type ReactCodeMirrorRef } from "@uiw/react-codemirror";
 import { json } from "@codemirror/lang-json";
 import { linter, type Diagnostic } from "@codemirror/lint";
 import type { EditorView } from "@codemirror/view";
 import type { ValidationDiagnostic } from "../domain/validation-result";
+import { scrollViewToLine } from "./json-editor-navigation";
+
+export type JsonEditorHandle = { scrollToLine(line: number): void };
 
 type Props = {
   value: string;
@@ -33,30 +36,42 @@ const toCodeMirrorDiagnostic = (
   };
 };
 
-export function JsonEditor({ value, diagnostics, onChange }: Props) {
-  const extensions = useMemo(
-    () => [
-      json(),
-      linter((view) =>
-        diagnostics.flatMap((item) => toCodeMirrorDiagnostic(view, item) ?? []),
-      ),
-    ],
-    [diagnostics],
-  );
-  return (
-    <CodeMirror
-      aria-label="JSON editor"
-      value={value}
-      height="calc(100vh - 9rem)"
-      theme="dark"
-      extensions={extensions}
-      basicSetup={{
-        lineNumbers: true,
-        bracketMatching: true,
-        closeBrackets: true,
-        foldGutter: true,
-      }}
-      onChange={onChange}
-    />
-  );
-}
+export const JsonEditor = forwardRef<JsonEditorHandle, Props>(
+  function JsonEditor({ value, diagnostics, onChange }, ref) {
+    const editorRef = useRef<ReactCodeMirrorRef>(null);
+    useImperativeHandle(ref, () => ({
+      scrollToLine(line: number) {
+        const view = editorRef.current?.view;
+        if (view) scrollViewToLine(view, line);
+      },
+    }));
+    const extensions = useMemo(
+      () => [
+        json(),
+        linter((view) =>
+          diagnostics.flatMap(
+            (item) => toCodeMirrorDiagnostic(view, item) ?? [],
+          ),
+        ),
+      ],
+      [diagnostics],
+    );
+    return (
+      <CodeMirror
+        ref={editorRef}
+        aria-label="JSON editor"
+        value={value}
+        height="calc(100vh - 9rem)"
+        theme="dark"
+        extensions={extensions}
+        basicSetup={{
+          lineNumbers: true,
+          bracketMatching: true,
+          closeBrackets: true,
+          foldGutter: true,
+        }}
+        onChange={onChange}
+      />
+    );
+  },
+);
