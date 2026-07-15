@@ -102,8 +102,12 @@ button:disabled {
   }
 }
 @media print {
+  html, body {
+    height: auto;
+    overflow: visible;
+  }
   astro-island {
-    display: block;
+    display: block !important;
   }
   .editor-toolbar,
   .editor-pane,
