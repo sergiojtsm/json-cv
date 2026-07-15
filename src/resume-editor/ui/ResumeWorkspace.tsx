@@ -13,6 +13,7 @@ import { JsonEditor, type JsonEditorHandle } from "./JsonEditor";
 import { TemplateSelector } from "./TemplateSelector";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { ErrorWidget } from "./ErrorWidget";
+import { computePreviewScale } from "./preview-scale";
 
 type Props = { dependencies?: ResumeEditorDependencies };
 
@@ -28,6 +29,7 @@ export function ResumeWorkspace({ dependencies }: Props) {
   const [mobileTab, setMobileTab] = useState<"editor" | "preview">("editor");
   const Template = templateRegistry[editor.state.selectedTemplate];
   const jsonEditorRef = useRef<JsonEditorHandle>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const outputDisabled =
     editor.state.status !== "valid" || !editor.state.currentResume;
 
@@ -68,6 +70,19 @@ ${(previewEl as HTMLElement).outerHTML}
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [outputDisabled]);
+
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const apply = () => {
+      const scale = computePreviewScale(el.clientWidth);
+      el.style.setProperty("--preview-scale", String(scale));
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const clear = () => {
     if (window.confirm("Clear the locally saved resume from this browser?"))
@@ -198,7 +213,7 @@ ${(previewEl as HTMLElement).outerHTML}
                 Preview shows the last valid version.
               </p>
             )}
-            <div data-testid="resume-preview">
+            <div data-testid="resume-preview" ref={previewRef}>
               {previewResume ? (
                 <Template resume={previewResume} />
               ) : (

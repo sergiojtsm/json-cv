@@ -80,6 +80,9 @@ body {
 .preview-pane {
   padding: 0.75rem;
 }
+[data-testid="resume-preview"] .resume-page {
+  zoom: var(--preview-scale, 1);
+}
 .stale-preview {
   margin: 0 0 0.75rem;
   padding: 0.5rem;
@@ -111,6 +114,9 @@ button:disabled {
   }
   .preview-pane {
     padding: 2rem;
+  }
+  [data-testid="resume-preview"] .resume-page {
+    zoom: 1;
   }
 }
 @media print {

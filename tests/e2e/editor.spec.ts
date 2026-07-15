@@ -166,3 +166,15 @@ test("toolbar wraps and does not overlap the tabs on mobile", async ({
     toolbarBox!.y + toolbarBox!.height - 1,
   );
 });
+
+test("A4 preview fits the viewport width on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".cm-content").click();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await page.getByRole("tab", { name: "Preview" }).click();
+  const page4 = page.locator(".resume-page");
+  await expect(page4).toBeVisible();
+  const box = await page4.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeLessThanOrEqual(390);
+});
