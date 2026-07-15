@@ -1,5 +1,11 @@
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
 .editor-app {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: #eef1f4;
   color: #172033;
 }
@@ -27,9 +33,10 @@
   border-radius: 0.35rem;
 }
 .editor-workspace {
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(22rem, 42%) minmax(0, 1fr);
-  height: calc(100vh - 3.5rem);
   overflow: hidden;
 }
 .editor-pane {
