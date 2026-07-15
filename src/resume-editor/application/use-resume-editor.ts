@@ -83,9 +83,9 @@ export const useResumeEditor = (dependencies: ResumeEditorDependencies) => {
     if (state.status === "valid" && state.currentResume)
       dependencies.fileGateway.download(state.currentResume);
   };
-  const print = () => {
+  const print = (html?: string) => {
     if (state.status === "valid" && state.currentResume)
-      dependencies.printGateway.print();
+      dependencies.printGateway.print(html);
   };
   const clear = () => {
     try {

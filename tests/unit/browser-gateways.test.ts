@@ -94,7 +94,7 @@ describe("BrowserResumeFileGateway", () => {
 });
 
 describe("BrowserPrintGateway", () => {
-  it("delegates printing to the browser", () => {
+  it("delegates printing to the browser when no HTML is given", () => {
     const print = vi.fn();
 
     new BrowserPrintGateway({ print }).print();
@@ -111,5 +111,38 @@ describe("BrowserPrintGateway", () => {
     expect(() => new BrowserPrintGateway({ print }).print()).toThrow(
       printError,
     );
+  });
+
+  it("writes HTML to a new window and prints it", () => {
+    const print = vi.fn();
+    const write = vi.fn();
+    const close = vi.fn();
+    const focus = vi.fn();
+    const open = vi.fn(() => ({
+      document: { write, close },
+      focus,
+      print,
+    })) as unknown as Window["open"];
+
+    new BrowserPrintGateway({ print }, { open }).print(
+      "<html><body>test</body></html>",
+    );
+
+    expect(open).toHaveBeenCalledWith("", "_blank");
+    expect(write).toHaveBeenCalledWith("<html><body>test</body></html>");
+    expect(close).toHaveBeenCalledOnce();
+    expect(focus).toHaveBeenCalledOnce();
+  });
+
+  it("does nothing when popup is blocked", () => {
+    const print = vi.fn();
+    const open = vi.fn(() => null) as unknown as Window["open"];
+
+    new BrowserPrintGateway({ print }, { open }).print(
+      "<html><body>test</body></html>",
+    );
+
+    expect(open).toHaveBeenCalledWith("", "_blank");
+    expect(print).not.toHaveBeenCalled();
   });
 });

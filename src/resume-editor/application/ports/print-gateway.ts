@@ -1,3 +1,3 @@
 export interface PrintGateway {
-  print(): void;
+  print(html?: string): void;
 }

@@ -20,7 +20,7 @@ export function ResumeWorkspace({ dependencies }: Props) {
     validator: new AjvResumeValidator(),
     draftRepository: new LocalStorageDraftRepository(window.localStorage),
     fileGateway: new BrowserResumeFileGateway(document, URL),
-    printGateway: new BrowserPrintGateway(window),
+    printGateway: new BrowserPrintGateway(window, window),
   }));
   const editor = useResumeEditor(dependencies ?? defaults);
   const previewResume = useDeferredValue(editor.state.lastValidResume);
@@ -28,6 +28,32 @@ export function ResumeWorkspace({ dependencies }: Props) {
   const Template = templateRegistry[editor.state.selectedTemplate];
   const outputDisabled =
     editor.state.status !== "valid" || !editor.state.currentResume;
+
+  const printResume = () => {
+    const previewEl = document.querySelector(
+      '[data-testid="resume-preview"] .resume-page',
+    );
+    if (!previewEl) {
+      editor.print();
+      return;
+    }
+    const styles = Array.from(document.querySelectorAll("style"))
+      .map((el) => el.outerHTML)
+      .join("\n");
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Resume</title>
+${styles}
+<style>html,body{margin:0;padding:0;background:white}</style>
+</head>
+<body>
+${(previewEl as HTMLElement).outerHTML}
+</body>
+</html>`;
+    editor.print(html);
+  };
 
   const clear = () => {
     if (window.confirm("Clear the locally saved resume from this browser?"))
@@ -77,7 +103,7 @@ export function ResumeWorkspace({ dependencies }: Props) {
           <button
             type="button"
             disabled={outputDisabled}
-            onClick={editor.print}
+            onClick={printResume}
           >
             Save as PDF
           </button>
