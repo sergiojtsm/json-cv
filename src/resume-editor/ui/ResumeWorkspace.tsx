@@ -1,4 +1,4 @@
-import { useDeferredValue, useState } from "react";
+import { useEffect, useDeferredValue, useState } from "react";
 import { templateRegistry } from "../../resume-templates/template-registry";
 import {
   useResumeEditor,
@@ -37,7 +37,8 @@ export function ResumeWorkspace({ dependencies }: Props) {
       editor.print();
       return;
     }
-    const styles = Array.from(document.querySelectorAll("style"))
+    const styleTags = document.querySelectorAll("style, link[rel=stylesheet]");
+    const styles = Array.from(styleTags)
       .map((el) => el.outerHTML)
       .join("\n");
     const html = `<!DOCTYPE html>
@@ -54,6 +55,17 @@ ${(previewEl as HTMLElement).outerHTML}
 </html>`;
     editor.print(html);
   };
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "p") {
+        event.preventDefault();
+        if (!outputDisabled) printResume();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [outputDisabled]);
 
   const clear = () => {
     if (window.confirm("Clear the locally saved resume from this browser?"))
