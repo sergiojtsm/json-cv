@@ -24,6 +24,7 @@ describe("scrollViewToLine", () => {
     expect(dispatch.mock.calls[0]![0]).toMatchObject({
       selection: { anchor: 42 },
     });
+    expect(dispatch.mock.calls[0][0].effects).toBeDefined();
   });
 
   it("clamps the line number to the document bounds", () => {
@@ -31,6 +32,8 @@ describe("scrollViewToLine", () => {
     scrollViewToLine(view, 99);
     expect(lineFn).toHaveBeenCalledWith(5);
     scrollViewToLine(view, -4);
+    expect(lineFn).toHaveBeenCalledWith(1);
+    scrollViewToLine(view, 0);
     expect(lineFn).toHaveBeenCalledWith(1);
   });
 });

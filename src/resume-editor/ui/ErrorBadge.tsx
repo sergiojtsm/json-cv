@@ -8,7 +8,8 @@ type Props = {
 };
 
 export function ErrorBadge({ count, open, controls, onToggle }: Props) {
-  const label = count > 0 ? `Ver ${count} problemas` : "Ver avisos";
+  const label =
+    count > 0 ? `Ver ${formatBadgeCount(count)} problemas` : "Ver avisos";
   return (
     <button
       type="button"
