@@ -21,7 +21,7 @@ describe("getJsonSyntaxErrorLocation", () => {
     expect(
       getJsonSyntaxErrorLocation(
         "Unexpected token 'x' in JSON at position 8",
-        "{\n  \"a\":x",
+        '{\n  "a":x',
       ),
     ).toEqual({ line: 2, column: 7 });
   });

@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { ROUTES } from "../../src/shared/routes";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/editor/");
+  await page.goto(ROUTES.EDITOR);
   await page.evaluate(() => localStorage.clear());
   await page.reload();
 });
@@ -84,21 +85,17 @@ test("loads example resume JSON", async ({ page }) => {
     page.getByTestId("resume-preview").getByText("Alex Morgan"),
   ).toBeVisible();
   await expect(
-    page.getByTestId("resume-preview").getByText("Senior Frontend Engineer", { exact: true }),
+    page
+      .getByTestId("resume-preview")
+      .getByText("Senior Frontend Engineer", { exact: true }),
   ).toBeVisible();
 });
 
 test("shows placeholder when editor is empty", async ({ page }) => {
-  await expect(
-    page.getByText(/Paste your JSON Resume/i),
-  ).toBeVisible();
-  await expect(
-    page.getByText("jsonresume.org"),
-  ).toBeVisible();
+  await expect(page.getByText(/Paste your JSON Resume/i)).toBeVisible();
+  await expect(page.getByText("jsonresume.org")).toBeVisible();
   await page.getByRole("button", { name: "Load example" }).click();
-  await expect(
-    page.getByText(/Paste your JSON Resume/i),
-  ).toHaveCount(0);
+  await expect(page.getByText(/Paste your JSON Resume/i)).toHaveCount(0);
 });
 
 test("print media hides editor chrome and keeps the preview", async ({

@@ -21,9 +21,7 @@ export function ValidationPanel({
         <p key={`${item.path}-${item.keyword}-${index}`}>
           <strong>{item.path === "/" ? "JSON" : item.path}</strong>:{" "}
           {item.message}
-          {item.line
-            ? ` (line ${item.line}, column ${item.column ?? 1})`
-            : ""}
+          {item.line ? ` (line ${item.line}, column ${item.column ?? 1})` : ""}
         </p>
       ))}
     </div>

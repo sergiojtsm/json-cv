@@ -38,9 +38,7 @@ export function JsonEditor({ value, diagnostics, onChange }: Props) {
     () => [
       json(),
       linter((view) =>
-        diagnostics.flatMap(
-          (item) => toCodeMirrorDiagnostic(view, item) ?? [],
-        ),
+        diagnostics.flatMap((item) => toCodeMirrorDiagnostic(view, item) ?? []),
       ),
     ],
     [diagnostics],

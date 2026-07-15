@@ -55,9 +55,7 @@ describe("useResumeEditor", () => {
 
   it("imports text, exports valid JSON, and clears persisted data", async () => {
     const deps = dependencies();
-    deps.fileGateway.read.mockResolvedValue(
-      '{"basics":{"name":"Imported"}}',
-    );
+    deps.fileGateway.read.mockResolvedValue('{"basics":{"name":"Imported"}}');
     const { result } = renderHook(() => useResumeEditor(deps));
     await act(() => result.current.importFile(new File(["x"], "resume.json")));
     act(() => result.current.exportJson());
@@ -88,9 +86,7 @@ describe("useResumeEditor", () => {
       throw new Error("quota");
     });
     const { result } = renderHook(() => useResumeEditor(deps));
-    act(() =>
-      result.current.changeDraft('{"basics":{"name":"In memory"}}'),
-    );
+    act(() => result.current.changeDraft('{"basics":{"name":"In memory"}}'));
     act(() => vi.advanceTimersByTime(300));
     expect(result.current.state.status).toBe("valid");
     expect(result.current.state.persistenceStatus).toBe("failed");

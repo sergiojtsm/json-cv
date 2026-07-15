@@ -1,6 +1,7 @@
 # Session State — 2026-07-15 JSON CV Editor
 
 ## Completed
+
 1. Print fix: ventana nueva con HTML plano (commit d24ea65 + afa5010)
 2. Root redirect a /editor/ (commit 338ee3b)
 3. Load example button (commit 5a78b0d)
@@ -10,6 +11,7 @@
 7. Architecture doc escrito (docs/ARCHITECTURE.md)
 
 ## Pending for GitHub Pages Deployment
+
 1. `astro.config.mjs` — añadir `site: "https://sergiojtsm.github.io"`, `base: "/json-cv/"`
 2. `src/pages/index.astro` — cambiar redirect a `import.meta.env.BASE_URL + "editor/"`
 3. `src/pages/feasibility/[template]/[fixture].astro` — cambiar `<a href="/">` a `import.meta.env.BASE_URL`
@@ -24,6 +26,7 @@
 12. Actualizar docs con paths correctos
 
 ## Edge Cases Identified
+
 - Popup blocker en print (window.open bloqueado)
 - Safari/Private: localStorage puede fallar
 - Error boundary si React crashea

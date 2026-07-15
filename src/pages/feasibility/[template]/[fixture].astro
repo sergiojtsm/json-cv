@@ -12,6 +12,7 @@ import {
   shortResume,
 } from "../../../resume-fixtures/resumes";
 import type { Resume } from "../../../resume/domain/generated/resume";
+import { ROUTES } from "../../../shared/routes";
 
 const fixtureRegistry = {
   short: shortResume,
@@ -42,11 +43,18 @@ const resume = fixtureRegistry[fixture];
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href={import.meta.env.BASE_URL + ROUTES.FAVICON}
+    />
     <title>{template} / {fixture} PDF fixture</title>
   </head>
   <body>
     <nav class="feasibility-toolbar">
-      <a href="/">Fixtures</a> · {template} · {fixture}
+      <a href={import.meta.env.BASE_URL + ROUTES.EDITOR}>Fixtures</a> · {
+        template
+      } · {fixture}
     </nav>
     <main
       class="preview-surface"

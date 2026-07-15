@@ -12,7 +12,9 @@ export class BrowserPrintGateway implements PrintGateway {
       return;
     }
     const win = this.opener.open("", "_blank");
-    if (!win) return;
+    if (!win) {
+      throw new Error("Popup blocked. Please allow popups for this site.");
+    }
     (win.document as { write(text: string): void }).write(html);
     win.document.close();
     win.focus();

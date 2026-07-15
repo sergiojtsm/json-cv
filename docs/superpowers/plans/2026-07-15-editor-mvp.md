@@ -1557,13 +1557,11 @@ test("retains stale preview and blocks output for invalid JSON", async ({
 });
 
 test("imports, exports, and clears local data", async ({ page }) => {
-  await page
-    .getByLabel("Import JSON file")
-    .setInputFiles({
-      name: "resume.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"basics":{"name":"Imported User"}}'),
-    });
+  await page.getByLabel("Import JSON file").setInputFiles({
+    name: "resume.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"basics":{"name":"Imported User"}}'),
+  });
   await expect(
     page.getByTestId("resume-preview").getByText("Imported User"),
   ).toBeVisible();

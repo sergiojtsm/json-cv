@@ -59,8 +59,7 @@ describe("BrowserResumeFileGateway", () => {
 
         expect(createObjectURL).toHaveBeenCalledOnce();
         expect(click).toHaveBeenCalledOnce();
-        const anchor = click.mock
-          .instances[0] as unknown as HTMLAnchorElement;
+        const anchor = click.mock.instances[0] as unknown as HTMLAnchorElement;
         expect(anchor.download).toBe("resume.json");
         expect(anchor.href).toBe("blob:resume");
         expect(revokeObjectURL).toHaveBeenCalledWith("blob:resume");
@@ -134,13 +133,15 @@ describe("BrowserPrintGateway", () => {
     expect(focus).toHaveBeenCalledOnce();
   });
 
-  it("does nothing when popup is blocked", () => {
+  it("throws when popup is blocked", () => {
     const print = vi.fn();
     const open = vi.fn(() => null) as unknown as Window["open"];
 
-    new BrowserPrintGateway({ print }, { open }).print(
-      "<html><body>test</body></html>",
-    );
+    expect(() =>
+      new BrowserPrintGateway({ print }, { open }).print(
+        "<html><body>test</body></html>",
+      ),
+    ).toThrow("Popup blocked");
 
     expect(open).toHaveBeenCalledWith("", "_blank");
     expect(print).not.toHaveBeenCalled();

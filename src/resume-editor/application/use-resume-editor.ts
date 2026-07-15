@@ -52,11 +52,7 @@ export const useResumeEditor = (dependencies: ResumeEditorDependencies) => {
       }
     }, 300);
     return () => window.clearTimeout(timeout);
-  }, [
-    dependencies.draftRepository,
-    state.rawText,
-    state.selectedTemplate,
-  ]);
+  }, [dependencies.draftRepository, state.rawText, state.selectedTemplate]);
 
   const changeDraft = (rawText: string) => {
     dispatch({
@@ -73,9 +69,7 @@ export const useResumeEditor = (dependencies: ResumeEditorDependencies) => {
       changeDraft(await dependencies.fileGateway.read(file));
     } catch (error) {
       setImportError(
-        error instanceof Error
-          ? error.message
-          : "Unable to import this file.",
+        error instanceof Error ? error.message : "Unable to import this file.",
       );
     }
   };
@@ -83,9 +77,21 @@ export const useResumeEditor = (dependencies: ResumeEditorDependencies) => {
     if (state.status === "valid" && state.currentResume)
       dependencies.fileGateway.download(state.currentResume);
   };
+  const [printError, setPrintError] = useState<string | null>(null);
+
   const print = (html?: string) => {
-    if (state.status === "valid" && state.currentResume)
-      dependencies.printGateway.print(html);
+    if (state.status === "valid" && state.currentResume) {
+      try {
+        setPrintError(null);
+        dependencies.printGateway.print(html);
+      } catch (error) {
+        setPrintError(
+          error instanceof Error
+            ? error.message
+            : "Unable to print. Try using the browser's print dialog.",
+        );
+      }
+    }
   };
   const clear = () => {
     try {
@@ -100,6 +106,7 @@ export const useResumeEditor = (dependencies: ResumeEditorDependencies) => {
   return {
     state,
     importError,
+    printError,
     changeDraft,
     selectTemplate,
     importFile,

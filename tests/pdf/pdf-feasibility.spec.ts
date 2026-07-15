@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { extractPdf } from "./extract-pdf";
+import { ROUTES } from "../../src/shared/routes";
 
 const templates = ["editorial", "minimal", "professional"] as const;
 const sectionOrder = [
@@ -41,7 +42,7 @@ test("print styles keep entry metadata with the following content", async ({
   page,
 }) => {
   await page.emulateMedia({ media: "print" });
-  await page.goto("/feasibility/minimal/short");
+  await page.goto(ROUTES.FEASIBILITY("minimal", "short"));
 
   const breakAfter = await page
     .locator(".entry-meta")
@@ -55,7 +56,7 @@ for (const template of templates) {
   test(`${template}: short resume is one selectable-text page`, async ({
     page,
   }) => {
-    const pdf = await createPdf(page, `/feasibility/${template}/short`);
+    const pdf = await createPdf(page, ROUTES.FEASIBILITY(template, "short"));
     const result = await extractPdf(pdf);
     console.log(`${template}/short: ${result.pageTexts.length} page(s)`);
     expect(result.pageTexts).toHaveLength(1);
@@ -66,10 +67,10 @@ for (const template of templates) {
   test(`${template}: complete resume preserves sections, order, and links`, async ({
     page,
   }) => {
-    const pdf = await createPdf(page, `/feasibility/${template}/complete`);
+    const pdf = await createPdf(page, ROUTES.FEASIBILITY(template, "complete"));
     const result = await extractPdf(pdf);
     const repeatedResult = await extractPdf(
-      await createPdf(page, `/feasibility/${template}/complete`),
+      await createPdf(page, ROUTES.FEASIBILITY(template, "complete")),
     );
     const text = result.pageTexts.join(" ");
     const positions = sectionOrder.map((heading) => text.indexOf(heading));
@@ -107,7 +108,7 @@ for (const template of templates) {
   test(`${template}: long resume paginates without blank pages or missing entries`, async ({
     page,
   }) => {
-    const pdf = await createPdf(page, `/feasibility/${template}/long`);
+    const pdf = await createPdf(page, ROUTES.FEASIBILITY(template, "long"));
     const result = await extractPdf(pdf);
     const text = result.pageTexts.join(" ");
     console.log(`${template}/long: ${result.pageTexts.length} page(s)`);
