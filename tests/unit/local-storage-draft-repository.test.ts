@@ -2,6 +2,28 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 import { LocalStorageDraftRepository } from "../../src/resume-editor/adapters/persistence/local-storage-draft-repository";
+import { parseStoredDraft } from "../../src/resume-editor/application/parse-stored-draft";
+
+describe("parseStoredDraft", () => {
+  it("rejects arrays with assigned draft fields", () => {
+    const value = [] as unknown as Record<string, unknown>;
+    value.version = 1;
+    value.rawText = "{}";
+    value.selectedTemplate = "minimal";
+
+    expect(parseStoredDraft(value)).toBeNull();
+  });
+
+  it("rejects records whose required fields are inherited", () => {
+    const value = Object.create({
+      version: 1,
+      rawText: "{}",
+      selectedTemplate: "minimal",
+    });
+
+    expect(parseStoredDraft(value)).toBeNull();
+  });
+});
 
 describe("LocalStorageDraftRepository", () => {
   beforeEach(() => localStorage.clear());
