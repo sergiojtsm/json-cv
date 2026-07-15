@@ -49,19 +49,18 @@ test("retains stale preview and blocks output for invalid JSON", async ({
 });
 
 test("imports, exports, and clears local data", async ({ page }) => {
-  await page
-    .getByLabel("Import JSON file")
-    .setInputFiles({
-      name: "resume.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"basics":{"name":"Imported User"}}'),
-    });
+  await page.getByLabel("Import JSON file").setInputFiles({
+    name: "resume.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"basics":{"name":"Imported User"}}'),
+  });
   await expect(
     page.getByTestId("resume-preview").getByText("Imported User"),
   ).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export JSON" }).click();
-  await expect((await downloadPromise).suggestedFilename()).toBe("resume.json");
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe("resume.json");
   page.on("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Clear local data" }).click();
   await expect(
@@ -74,10 +73,7 @@ test("uses Editor and Preview tabs on mobile", async ({ page }) => {
   await expect(page.getByRole("tab", { name: "Editor" })).toBeVisible();
   await page.getByRole("tab", { name: "Preview" }).click();
   await expect(page.locator(".editor-pane")).toHaveCSS("display", "none");
-  await expect(page.locator(".preview-pane")).not.toHaveCSS(
-    "display",
-    "none",
-  );
+  await expect(page.locator(".preview-pane")).not.toHaveCSS("display", "none");
 });
 
 test("print media hides editor chrome and keeps the preview", async ({
@@ -89,10 +85,7 @@ test("print media hides editor chrome and keeps the preview", async ({
   await page.keyboard.type('{"basics":{"name":"Print User"}}');
   await page.emulateMedia({ media: "print" });
   await expect(page.locator(".editor-toolbar")).toHaveCSS("display", "none");
-  await expect(page.locator(".template-selector")).toHaveCSS(
-    "display",
-    "none",
-  );
+  await expect(page.locator(".template-selector")).toHaveCSS("display", "none");
   await expect(
     page.getByTestId("resume-preview").getByText("Print User"),
   ).toBeVisible();
