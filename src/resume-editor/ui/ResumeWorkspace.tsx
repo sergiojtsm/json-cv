@@ -114,6 +114,17 @@ export function ResumeWorkspace({ dependencies }: Props) {
           className="editor-pane"
           data-mobile-hidden={mobileTab !== "editor"}
         >
+          {editor.state.status === "empty" && (
+            <div className="editor-placeholder">
+              <p>
+                Paste your JSON Resume or import a file. The format follows the{" "}
+                <a href="https://jsonresume.org/schema/" target="_blank" rel="noopener noreferrer">
+                  jsonresume.org
+                </a>{" "}
+                schema.
+              </p>
+            </div>
+          )}
           <JsonEditor
             value={editor.state.rawText}
             diagnostics={editor.state.diagnostics}

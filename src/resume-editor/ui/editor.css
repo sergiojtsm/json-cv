@@ -29,8 +29,25 @@
   min-height: calc(100vh - 4rem);
 }
 .editor-pane {
+  position: relative;
   min-width: 0;
   background: #111827;
+}
+.editor-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  text-align: center;
+  pointer-events: none;
+}
+.editor-placeholder a {
+  pointer-events: auto;
+  color: #60a5fa;
 }
 .preview-pane {
   min-width: 0;

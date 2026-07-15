@@ -88,6 +88,19 @@ test("loads example resume JSON", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("shows placeholder when editor is empty", async ({ page }) => {
+  await expect(
+    page.getByText(/Paste your JSON Resume/i),
+  ).toBeVisible();
+  await expect(
+    page.getByText("jsonresume.org"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await expect(
+    page.getByText(/Paste your JSON Resume/i),
+  ).toHaveCount(0);
+});
+
 test("print media hides editor chrome and keeps the preview", async ({
   page,
 }) => {
