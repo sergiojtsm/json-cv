@@ -1,4 +1,4 @@
-import { useEffect, useDeferredValue, useState } from "react";
+import { useEffect, useDeferredValue, useRef, useState } from "react";
 import { templateRegistry } from "../../resume-templates/template-registry";
 import {
   useResumeEditor,
@@ -9,10 +9,10 @@ import { completeResume } from "../../resume-fixtures/resumes";
 import { BrowserResumeFileGateway } from "../adapters/browser/browser-resume-file-gateway";
 import { LocalStorageDraftRepository } from "../adapters/persistence/local-storage-draft-repository";
 import { AjvResumeValidator } from "../adapters/validation/ajv-resume-validator";
-import { JsonEditor } from "./JsonEditor";
+import { JsonEditor, type JsonEditorHandle } from "./JsonEditor";
 import { TemplateSelector } from "./TemplateSelector";
 import { ErrorBoundary } from "./ErrorBoundary";
-import { ValidationPanel } from "./ValidationPanel";
+import { ErrorWidget } from "./ErrorWidget";
 
 type Props = { dependencies?: ResumeEditorDependencies };
 
@@ -27,6 +27,7 @@ export function ResumeWorkspace({ dependencies }: Props) {
   const previewResume = useDeferredValue(editor.state.lastValidResume);
   const [mobileTab, setMobileTab] = useState<"editor" | "preview">("editor");
   const Template = templateRegistry[editor.state.selectedTemplate];
+  const jsonEditorRef = useRef<JsonEditorHandle>(null);
   const outputDisabled =
     editor.state.status !== "valid" || !editor.state.currentResume;
 
@@ -98,6 +99,12 @@ ${(previewEl as HTMLElement).outerHTML}
                     ? "Saved locally"
                     : "Local only"}
           </span>
+          <ErrorWidget
+            diagnostics={editor.state.diagnostics}
+            importError={editor.importError}
+            persistenceFailed={editor.state.persistenceStatus === "failed"}
+            onNavigate={(line) => jsonEditorRef.current?.scrollToLine(line)}
+          />
           <div className="editor-actions">
             <label className="file-action">
               Import JSON
@@ -176,14 +183,10 @@ ${(previewEl as HTMLElement).outerHTML}
               </div>
             )}
             <JsonEditor
+              ref={jsonEditorRef}
               value={editor.state.rawText}
               diagnostics={editor.state.diagnostics}
               onChange={editor.changeDraft}
-            />
-            <ValidationPanel
-              diagnostics={editor.state.diagnostics}
-              importError={editor.importError}
-              persistenceFailed={editor.state.persistenceStatus === "failed"}
             />
           </section>
           <section

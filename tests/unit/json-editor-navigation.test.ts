@@ -21,7 +21,7 @@ describe("scrollViewToLine", () => {
     scrollViewToLine(view, 3);
     expect(lineFn).toHaveBeenCalledWith(3);
     expect(dispatch).toHaveBeenCalledTimes(1);
-    expect(dispatch.mock.calls[0][0]).toMatchObject({
+    expect(dispatch.mock.calls[0]![0]).toMatchObject({
       selection: { anchor: 42 },
     });
   });
