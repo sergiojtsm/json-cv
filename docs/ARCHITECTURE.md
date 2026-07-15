@@ -28,7 +28,9 @@
 | `ResumeWorkspace.tsx`  | Componente raíz del editor. Toolbar, grid editor+preview, botones (importar, exportar, PDF, Clear, Load example), placeholder vacío |
 | `JsonEditor.tsx`       | Wrapper de CodeMirror 6 con theme oscuro, lint de JSON, extensiones                                                                 |
 | `TemplateSelector.tsx` | Radio buttons para elegir template (editorial/minimal/professional)                                                                 |
-| `ValidationPanel.tsx`  | Muestra errores de validación JSON debajo del editor                                                                                |
+| `ErrorWidget.tsx`      | Badge de errores en la toolbar que abre un dropdown con diagnósticos, errores de importación y fallos de guardado                    |
+| `ErrorBadge.tsx`       | Botón/contador de errores en la toolbar (aria-expanded/controls)                                                                     |
+| `ErrorDropdown.tsx`    | Panel flotante con la lista de problemas; filas con línea navegan en el editor                                                       |
 | `ErrorBoundary.tsx`    | React Error Boundary que captura errores de renderizado y muestra pantalla de fallback con botón de recarga                         |
 | `editor.css`           | Todos los estilos del editor: layout sticky+scroll, responsive, print                                                               |
 

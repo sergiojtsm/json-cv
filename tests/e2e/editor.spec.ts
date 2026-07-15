@@ -112,3 +112,21 @@ test("print media hides editor chrome and keeps the preview", async ({
     page.getByTestId("resume-preview").getByText("Print User"),
   ).toBeVisible();
 });
+
+test("surfaces validation errors through the toolbar badge", async ({
+  page,
+}) => {
+  const editor = page.locator(".cm-content");
+  await editor.click();
+  await page.keyboard.press("ControlOrMeta+A");
+  await page.keyboard.type("{");
+  await page.keyboard.press("Delete");
+  const badge = page.getByRole("button", { name: /Ver \d+ problemas/ });
+  await expect(badge).toBeVisible();
+  await badge.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await editor.click();
+  await page.keyboard.press("ControlOrMeta+A");
+  await page.keyboard.press("Delete");
+  await expect(badge).toHaveCount(0);
+});
