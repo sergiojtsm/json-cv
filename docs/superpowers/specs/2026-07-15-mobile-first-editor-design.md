@@ -47,12 +47,16 @@ Rewrite `editor.css` so base styles target mobile; add desktop layout under
 
 ### 2. Root layout / scroll fix
 
-- Remove the global `overflow: hidden` on `html, body`.
-- Base (mobile): `.editor-app` is `flex-direction: column`,
-  `min-height: 100dvh`. The active pane (editor **or** preview per tab) fills the
-  remaining space and owns `overflow-y: auto`, so it scrolls.
-- Desktop (`min-width: 800px`): restore `height: 100dvh` + 2-column grid, each
-  pane with its own scroll (current behaviour).
+- Keep `overflow: hidden` on `html, body` and give `.editor-app`
+  `height: 100dvh` so the app owns a bounded viewport height. The scroll bug was
+  caused by the mobile workspace switching to `display: block` (breaking the
+  flex height-chain), not by the root `overflow`.
+- Base (mobile): `.editor-app` is `flex-direction: column`; `.editor-workspace`
+  stays `display: flex` (column) with `flex: 1; min-height: 0`; the active pane
+  (editor **or** preview per tab) fills the remaining space with
+  `flex: 1; min-height: 0` and owns `overflow-y: auto`, so it scrolls.
+- Desktop (`min-width: 800px`): `.editor-workspace` becomes the 2-column grid,
+  each pane with its own scroll (current behaviour).
 
 ### 3. Header
 
@@ -64,12 +68,17 @@ Rewrite `editor.css` so base styles target mobile; add desktop layout under
 
 ### 4. A4 preview scaling (mobile)
 
-- Scale `.resume-page` to fit width with `transform: scale(...)`,
-  `transform-origin: top center`. Attempt pure CSS first
-  (`scale(min(1, (100vw - padding) / 210mm))`); if exactness fails, add a tiny
-  width-measuring hook in `ResumeWorkspace` that sets a `--preview-scale` var.
-- Fix current `.preview-surface`/`.preview-pane` `overflow-x: auto` so no
-  horizontal scroll is needed once scaled.
+- Scale `.resume-page` to fit width with CSS `zoom: var(--preview-scale, 1)`
+  (chosen over `transform: scale` because `zoom` reflows the layout box, so the
+  scaled page reports its scaled width/height and needs no horizontal scroll).
+  Pure-CSS scaling is not viable — CSS `calc` cannot divide `100vw` by `210mm`
+  to yield a unitless factor — so a small `ResizeObserver` hook in
+  `ResumeWorkspace` measures the preview width and sets `--preview-scale` (via
+  the pure, unit-tested `computePreviewScale` helper). The observer is
+  feature-guarded (`typeof ResizeObserver === "undefined"`) for jsdom.
+- Desktop (`min-width: 800px`) forces `zoom: 1` for pixel-perfect fidelity.
+- The `@media print` block also resets `zoom: 1` so native mobile printing keeps
+  the real full-size A4.
 
 ### 5. No logic changes
 
