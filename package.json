@@ -13,8 +13,9 @@
     "build": "npm run generate:types && astro check && astro build",
     "preview": "astro preview",
     "test": "vitest run --passWithNoTests",
-    "test:pdf": "playwright test",
-    "test:all": "npm test && npm run test:pdf && npm run build && npm run check:generated-types",
+    "test:pdf": "playwright test tests/pdf",
+    "test:e2e": "playwright test tests/e2e",
+    "test:all": "npm test && npm run test:pdf && npm run test:e2e && npm run build && npm run check:generated-types",
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

@@ -1,0 +1,22 @@
+---
+import ResumeWorkspace from "../resume-editor/ui/ResumeWorkspace";
+import "../resume-editor/ui/editor.css";
+import "../resume-templates/template.css";
+import "../shared/styles/global.css";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta
+      name="description"
+      content="Edit JSON Resume locally and save an ATS-friendly PDF."
+    />
+    <title>JSON Resume Editor</title>
+  </head>
+  <body>
+    <ResumeWorkspace client:only="react" />
+  </body>
+</html>
