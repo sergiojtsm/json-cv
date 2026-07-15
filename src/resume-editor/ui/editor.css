@@ -4,7 +4,7 @@ body {
   overflow: hidden;
 }
 .editor-app {
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background: #eef1f4;
@@ -15,35 +15,50 @@ body {
   top: 0;
   z-index: 10;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.75rem;
   color: white;
   background: #172033;
 }
-.editor-actions,
-.mobile-tabs {
+.editor-actions {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.editor-actions button,
+.file-action {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.6rem;
 }
 .file-action {
   cursor: pointer;
-  padding: 0.35rem 0.6rem;
   border: 1px solid currentColor;
   border-radius: 0.35rem;
+}
+.mobile-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
 }
 .editor-workspace {
   flex: 1;
   min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(22rem, 42%) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+}
+.editor-pane,
+.preview-pane {
+  min-width: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 .editor-pane {
   position: relative;
-  min-width: 0;
-  overflow-y: auto;
   background: #111827;
 }
 .editor-placeholder {
@@ -63,36 +78,45 @@ body {
   color: #60a5fa;
 }
 .preview-pane {
-  min-width: 0;
-  overflow-y: auto;
-  padding: 2rem;
+  padding: 0.75rem;
+}
+[data-testid="resume-preview"] .resume-page {
+  zoom: var(--preview-scale, 1);
 }
 .stale-preview {
   margin: 0 0 0.75rem;
   padding: 0.5rem;
   background: #fff7d6;
 }
-.mobile-tabs {
+.editor-pane[data-mobile-hidden="true"],
+.preview-pane[data-mobile-hidden="true"] {
   display: none;
 }
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
-@media (max-width: 800px) {
-  .editor-workspace {
-    display: block;
+@media (min-width: 800px) {
+  .editor-actions button,
+  .file-action {
+    font-size: inherit;
   }
   .mobile-tabs {
-    display: flex;
-    padding: 0.5rem;
+    display: none;
+  }
+  .editor-workspace {
+    display: grid;
+    grid-template-columns: minmax(22rem, 42%) minmax(0, 1fr);
   }
   .editor-pane[data-mobile-hidden="true"],
   .preview-pane[data-mobile-hidden="true"] {
-    display: none;
+    display: block;
   }
   .preview-pane {
-    padding: 0.75rem;
+    padding: 2rem;
+  }
+  [data-testid="resume-preview"] .resume-page {
+    zoom: 1;
   }
 }
 @media print {
@@ -120,6 +144,9 @@ button:disabled {
     padding: 0;
     overflow: visible;
     background: white;
+  }
+  [data-testid="resume-preview"] .resume-page {
+    zoom: 1;
   }
 }
 .error-widget {

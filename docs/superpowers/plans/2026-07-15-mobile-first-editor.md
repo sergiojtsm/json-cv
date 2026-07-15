@@ -22,9 +22,11 @@
 ### Task 1: Fix viewport meta
 
 **Files:**
+
 - Modify: `src/pages/editor.astro` (the `<meta name="viewport" ...>` line)
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: correct mobile scaling for all subsequent CSS work.
 
@@ -61,10 +63,12 @@ git commit -m "fix: add initial-scale to editor viewport meta"
 Rewrite `editor.css` so the base cascade targets mobile and keeps the flex height-chain so the active pane scrolls. Desktop layout moves under `@media (min-width: 800px)`.
 
 **Files:**
+
 - Modify: `src/resume-editor/ui/editor.css` (lines 1-124, the layout block up to and including the print block; leave the `.error-widget`/`.error-*` block at 125-233 unchanged)
 - Test: `tests/e2e/editor.spec.ts` (add one test)
 
 **Interfaces:**
+
 - Consumes: existing markup classes `.editor-app`, `.editor-toolbar`, `.editor-actions`, `.file-action`, `.mobile-tabs`, `.editor-workspace`, `.editor-pane`, `.preview-pane`, and the `data-mobile-hidden` attribute (all already emitted by `ResumeWorkspace.tsx`).
 - Produces: mobile-first layout where `.editor-workspace` stays `display: flex` (column) on mobile, so `.preview-pane` / `.editor-pane` have bounded height and their `overflow-y: auto` scrolls. Reserves the `--preview-scale` custom property consumed in Task 4.
 
@@ -272,10 +276,12 @@ The CSS from Task 2 already gives `.editor-toolbar` and `.editor-actions`
 overlaps the content below it on a narrow viewport.
 
 **Files:**
+
 - Test: `tests/e2e/editor.spec.ts` (add one test)
 - Modify (only if the test fails): `src/resume-editor/ui/editor.css`
 
 **Interfaces:**
+
 - Consumes: the mobile-first toolbar rules from Task 2.
 - Produces: verified non-overlapping header at 390px width.
 
@@ -314,7 +320,7 @@ In `src/resume-editor/ui/editor.css`, inside the base `.editor-toolbar` rule,
 reduce the horizontal padding to give the wrapped rows more room:
 
 ```css
-  padding: 0.5rem 0.6rem;
+padding: 0.5rem 0.6rem;
 ```
 
 Then re-run Step 2 until it passes.
@@ -335,12 +341,14 @@ Add a pure, unit-tested helper that computes the scale factor, wire it into
 custom property, and apply it via CSS `zoom` on mobile.
 
 **Files:**
+
 - Create: `src/resume-editor/ui/preview-scale.ts`
 - Create: `tests/unit/preview-scale.test.ts`
 - Modify: `src/resume-editor/ui/ResumeWorkspace.tsx`
 - Modify: `src/resume-editor/ui/editor.css`
 
 **Interfaces:**
+
 - Consumes: the `[data-testid="resume-preview"]` element rendered by `ResumeWorkspace`, and the `--preview-scale` property reserved in Task 2.
 - Produces:
   - `A4_WIDTH_PX: number` (constant `793.7`).
@@ -420,24 +428,24 @@ import { computePreviewScale } from "./preview-scale";
 Add a ref alongside `jsonEditorRef` (after line 30, `const jsonEditorRef = useRef<JsonEditorHandle>(null);`):
 
 ```ts
-  const previewRef = useRef<HTMLDivElement>(null);
+const previewRef = useRef<HTMLDivElement>(null);
 ```
 
 Add this effect after the existing `useEffect` keyboard block (after line 70):
 
 ```ts
-  useEffect(() => {
-    const el = previewRef.current;
-    if (!el || typeof ResizeObserver === "undefined") return;
-    const apply = () => {
-      const scale = computePreviewScale(el.clientWidth);
-      el.style.setProperty("--preview-scale", String(scale));
-    };
-    apply();
-    const observer = new ResizeObserver(apply);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+useEffect(() => {
+  const el = previewRef.current;
+  if (!el || typeof ResizeObserver === "undefined") return;
+  const apply = () => {
+    const scale = computePreviewScale(el.clientWidth);
+    el.style.setProperty("--preview-scale", String(scale));
+  };
+  apply();
+  const observer = new ResizeObserver(apply);
+  observer.observe(el);
+  return () => observer.disconnect();
+}, []);
 ```
 
 Attach the ref to the preview container. Change the line:
@@ -468,9 +476,9 @@ And inside the existing `@media (min-width: 800px)` block, force full size on
 desktop by adding:
 
 ```css
-  [data-testid="resume-preview"] .resume-page {
-    zoom: 1;
-  }
+[data-testid="resume-preview"] .resume-page {
+  zoom: 1;
+}
 ```
 
 - [ ] **Step 7: Run unit tests to verify no regressions**

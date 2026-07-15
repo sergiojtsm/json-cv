@@ -77,6 +77,24 @@ test("uses Editor and Preview tabs on mobile", async ({ page }) => {
   await expect(page.locator(".preview-pane")).not.toHaveCSS("display", "none");
 });
 
+test("preview pane scrolls independently on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".cm-content").click();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await page.getByRole("tab", { name: "Preview" }).click();
+  const pane = page.locator(".preview-pane");
+  await expect(pane).toBeVisible();
+  const canScroll = await pane.evaluate(
+    (el) => el.scrollHeight > el.clientHeight,
+  );
+  expect(canScroll).toBe(true);
+  await pane.evaluate((el) => {
+    el.scrollTop = 200;
+  });
+  const scrolled = await pane.evaluate((el) => el.scrollTop);
+  expect(scrolled).toBeGreaterThan(0);
+});
+
 test("loads example resume JSON", async ({ page }) => {
   const editor = page.locator(".cm-content");
   await editor.click();
@@ -129,4 +147,47 @@ test("surfaces validation errors through the toolbar badge", async ({
   await page.keyboard.press("ControlOrMeta+A");
   await page.keyboard.press("Delete");
   await expect(badge).toHaveCount(0);
+});
+
+test("toolbar wraps and does not overlap the tabs on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const toolbar = page.locator(".editor-toolbar");
+  const tabs = page.locator(".mobile-tabs");
+  await expect(toolbar).toBeVisible();
+  await expect(tabs).toBeVisible();
+  const toolbarBox = await toolbar.boundingBox();
+  const tabsBox = await tabs.boundingBox();
+  expect(toolbarBox).not.toBeNull();
+  expect(tabsBox).not.toBeNull();
+  // The tabs start at or below the bottom of the (possibly wrapped) toolbar.
+  expect(tabsBox!.y).toBeGreaterThanOrEqual(
+    toolbarBox!.y + toolbarBox!.height - 1,
+  );
+});
+
+test("A4 preview fits the viewport width on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".cm-content").click();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await page.getByRole("tab", { name: "Preview" }).click();
+  const page4 = page.locator(".resume-page");
+  await expect(page4).toBeVisible();
+  const box = await page4.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.width).toBeLessThanOrEqual(390);
+});
+
+test("print media renders full-size A4 preview on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".cm-content").click();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await page.getByRole("tab", { name: "Preview" }).click();
+  await page.emulateMedia({ media: "print" });
+  const zoom = await page
+    .locator(".resume-page")
+    .evaluate((el) => getComputedStyle(el).zoom);
+  // zoom resolves to "1" (or "normal") when reset for print
+  expect(["1", "normal"]).toContain(zoom);
 });

@@ -147,8 +147,4 @@
     padding: 0.75rem;
     overflow-x: auto;
   }
-
-  .resume-page {
-    transform-origin: top left;
-  }
 }
