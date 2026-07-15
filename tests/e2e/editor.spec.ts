@@ -76,6 +76,18 @@ test("uses Editor and Preview tabs on mobile", async ({ page }) => {
   await expect(page.locator(".preview-pane")).not.toHaveCSS("display", "none");
 });
 
+test("loads example resume JSON", async ({ page }) => {
+  const editor = page.locator(".cm-content");
+  await editor.click();
+  await page.getByRole("button", { name: "Load example" }).click();
+  await expect(
+    page.getByTestId("resume-preview").getByText("Alex Morgan"),
+  ).toBeVisible();
+  await expect(
+    page.getByTestId("resume-preview").getByText("Senior Frontend Engineer", { exact: true }),
+  ).toBeVisible();
+});
+
 test("print media hides editor chrome and keeps the preview", async ({
   page,
 }) => {

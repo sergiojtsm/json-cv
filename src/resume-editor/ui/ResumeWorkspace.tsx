@@ -5,6 +5,7 @@ import {
   type ResumeEditorDependencies,
 } from "../application/use-resume-editor";
 import { BrowserPrintGateway } from "../adapters/browser/browser-print-gateway";
+import { completeResume } from "../../resume-fixtures/resumes";
 import { BrowserResumeFileGateway } from "../adapters/browser/browser-resume-file-gateway";
 import { LocalStorageDraftRepository } from "../adapters/persistence/local-storage-draft-repository";
 import { AjvResumeValidator } from "../adapters/validation/ajv-resume-validator";
@@ -31,6 +32,12 @@ export function ResumeWorkspace({ dependencies }: Props) {
   const clear = () => {
     if (window.confirm("Clear the locally saved resume from this browser?"))
       editor.clear();
+  };
+
+  const loadExample = () => {
+    if (editor.state.rawText && !window.confirm("Replace current content with the example?"))
+      return;
+    editor.changeDraft(JSON.stringify(completeResume, null, 2));
   };
 
   return (
@@ -76,6 +83,9 @@ export function ResumeWorkspace({ dependencies }: Props) {
           </button>
           <button type="button" onClick={clear}>
             Clear local data
+          </button>
+          <button type="button" onClick={loadExample}>
+            Load example
           </button>
         </div>
       </header>
